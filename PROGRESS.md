@@ -1,14 +1,25 @@
 # Letterbundle Development Progress
 
-**Last Updated**: January 8, 2026
+**Last Updated**: January 8, 2026 (23:30 UTC)  
+**Current Status**: Phase 6 Complete + All Critical Bugs Fixed ✅
 
 ## Overview
 
-Letterbundle is a platform for sharing collections of handwritten letters with automatic OCR transcription, built with FastAPI (backend), Next.js (frontend), PostgreSQL, and AWS S3.
+Letterbundle is a platform for sharing collections of handwritten letters with automatic OCR transcription, built with FastAPI (backend), Next.js (frontend), PostgreSQL, and AWS S3. Full end-to-end OCR pipeline is operational.
 
 ## ✅ Completed Phases
 
 ### Phase 1: Project Setup ✓ (100%)
+### Phase 2: Auth & Users ✓ (100%)
+### Phase 3: Services ✓ (100%)
+### Phase 4: OCR Integration ✓ (100%)
+### Phase 5: Frontend OCR UI ✓ (100%)
+### Phase 6: Public Bundle Viewing ✓ (100%)
+### Docker Containerization ✓ (100%)
+
+### Detailed Phase Summaries
+
+#### Phase 1: Project Setup ✓ (100%)
 
 **Backend Infrastructure:**
 - ✓ FastAPI application structure with CORS
@@ -124,42 +135,122 @@ curl -H "Authorization: Bearer <TOKEN>" http://localhost:8000/api/auth/me
 - ✓ Automatic JWT injection for protected routes
 - ✓ Environment variable configuration
 
+## 🐛 Critical Bug Fixes (Jan 8, 2026)
+
+All 5 critical bugs blocking the OCR pipeline have been identified and fixed:
+
+### Bug #1: File Upload Button Not Clickable ✅
+- **Symptom**: "Choose Files" button didn't open file picker
+- **Root Cause**: Button nested inside label, conflicting click handlers
+- **Fix**: Converted label to be clickable element directly
+- **Commit**: `a860bab`
+
+### Bug #2: Mistral API Key Not Found ✅
+- **Symptom**: "API key is required"
+- **Root Cause**: Key file lookup only checked working directory
+- **Fix**: Smart directory traversal (checks env var, then searches up 10 levels)
+- **Commit**: `a05139e`
+
+### Bug #3: S3 Bucket Doesn't Exist ✅
+- **Symptoms**: "Bucket does not exist" errors during OCR
+- **Root Causes**: 
+  - S3_ENDPOINT_URL not configured
+  - Bucket not auto-created on startup
+  - Init script not executable
+- **Fixes**:
+  - Added S3_ENDPOINT_URL environment variable
+  - Bucket auto-created in app startup lifespan
+  - Made init script executable
+- **Commit**: `c216b11`
+
+### Bug #4: Wrong OCR Method Name ✅
+- **Symptom**: "'OCRClient' object has no attribute 'process_image'"
+- **Root Cause**: Called `process_image()` but method is `process_image_bytes()`
+- **Fix**: Changed method call to `process_image_bytes()`
+- **Commit**: `d8ba17f`
+
+### Bug #5: Frontend Getting 404 on OCR Status ✅
+- **Symptom**: Frontend polling for non-existent endpoint, transcription never appears
+- **Root Cause**: `GET /api/letters/{id}/ocr-status` endpoint doesn't exist
+- **Fix**: Simplified to poll existing letter endpoint and check if transcription field is populated
+- **Commit**: `2f84ac6`
+
 ## 📋 Current Status
 
-**Backend:** Ready for Phase 3 (Bundles)
+**Backend:** Fully operational
 - Health check: ✓ Working
 - Auth flow: ✓ Tested and working
+- OCR pipeline: ✓ End-to-end working
 - Database: ✓ Migrations applied
+- S3 integration: ✓ LocalStack configured and working
 
-**Frontend:** Ready for auth page testing
-- Build configuration: ✓ Complete
-- Auth context: ✓ Implemented
-- Pages structure: ✓ Set up
+**Frontend:** Fully operational
+- Authentication: ✓ Complete
+- File upload: ✓ Working
+- OCR UI: ✓ Complete with real-time polling
+- Public browsing: ✓ Complete
+- User profiles: ✓ Complete
+- Docker build: ✓ Production and dev modes
 
-**Services:** Ready for integration
-- Image processing: ✓ Complete
-- S3 storage: ✓ Complete
+**Services:** All operational
+- Image processing: ✓ Complete and tested
+- S3 storage: ✓ LocalStack configured and working
+- OCR service: ✓ Mistral AI integration working
+- API client: ✓ Full typed client
 
-## 🚀 Next Steps (Phase 3: Bundles)
+## 🚀 Complete OCR Pipeline (Now Working!)
 
-1. **Bundle CRUD Endpoints**
-   - `GET /api/bundles` - List user's bundles
-   - `POST /api/bundles` - Create bundle
-   - `GET /api/bundles/{id}` - Get bundle details
-   - `PUT /api/bundles/{id}` - Update bundle
-   - `DELETE /api/bundles/{id}` - Delete bundle
-   - `GET /api/bundles/by-slug/{slug}` - Get public bundle
+The entire image upload → OCR → transcription pipeline is **fully operational**:
 
-2. **Bundle UI**
-   - Dashboard page (list bundles)
-   - Create bundle form
-   - Edit bundle form
-   - Delete confirmation dialog
+```
+User Action                  → Backend Process                → Result
+════════════════════════════════════════════════════════════════════════════
+1. Click "Choose Files"      → File picker opens              ✓
+2. Select & upload images    → POST /api/letters/{id}/pages   ✓
+3. Images stored in S3       → Bucket auto-created            ✓
+4. Click "Process OCR"       → POST /api/letters/{id}/process ✓
+5. Background task starts    → Mistral API key found          ✓
+6. Image downloaded          → From S3 LocalStack             ✓
+7. process_image_bytes()     → Correct method called          ✓
+8. Mistral processes image   → OCR extraction                 ✓
+9. Transcription saved       → Database updated               ✓
+10. Frontend polls            → GET /api/letters/{id}         ✓
+11. Detects transcription     → Field is populated             ✓
+12. Stops polling             → Displays transcription         ✓
+```
 
-3. **Bundle Validation**
-   - Slug uniqueness across entire system
-   - Reserved words validation
-   - Length constraints (4-30 characters)
+## 🎯 Next Steps (Phase 7+)
+
+### Phase 7: Search & Discovery
+- [ ] Full-text search on bundle titles/descriptions
+- [ ] Filter bundles by date range, author
+- [ ] User profile: Display user's public bundles list
+- [ ] User settings: Privacy controls (public/private toggle for bundles)
+
+### Phase 8: Social Features
+- [ ] Comments on public bundles
+- [ ] Favorites/bookmarks system
+- [ ] Share links/embedding
+- [ ] User following (optional)
+
+### Phase 9: Backend Containerization
+- [ ] Create backend/Dockerfile (production build)
+- [ ] Add backend service to docker-compose.yml
+- [ ] Eliminate need to run backend locally
+- [ ] Full Docker stack for production
+
+### Phase 10: AWS Deployment
+- [ ] Push images to ECR (Elastic Container Registry)
+- [ ] RDS PostgreSQL setup
+- [ ] Production S3 bucket configuration
+- [ ] ECS task definitions
+- [ ] ALB (Application Load Balancer) setup
+
+### Phase 11: CI/CD Pipeline
+- [ ] GitHub Actions workflow
+- [ ] Automated testing on push
+- [ ] Docker image builds
+- [ ] Auto-deployment to staging/production
 
 ## 🔧 Development Setup
 
@@ -290,6 +381,38 @@ src/
 - **Git Commits**: 1 initial commit
 - **Estimated Implementation Time**: 2-3 weeks to MVP
 
+## 📊 Recent Commits (Session 2)
+
+```
+2f84ac6 - Simplify OCR status polling - use letter endpoint instead of ocr-status
+d8ba17f - Fix OCR method name: process_image -> process_image_bytes
+c216b11 - Fix S3 bucket initialization and LocalStack endpoint configuration
+a05139e - Fix Mistral API key lookup in OCR service
+a860bab - Fix file upload button not triggering file picker
+49a987e - Phase 6: Public bundle viewing and user profiles
+87c991f - Complete Docker containerization with production and development builds
+```
+
+## 📝 Key Files Modified (Session 2)
+
+**Backend:**
+- `backend/app/services/ocr.py` - Smart API key lookup + fixed method name
+- `backend/app/main.py` - Added S3 bucket auto-initialization
+- `backend/app/services/storage.py` - Unchanged, all features working
+
+**Frontend:**
+- `frontend/src/app/dashboard/bundles/[id]/letters/[letterid]/page.tsx` - Simplified OCR polling
+- `frontend/src/app/[slug]/page.tsx` - New public bundle viewer
+- `frontend/src/app/users/[username]/page.tsx` - New user profile pages
+- `frontend/src/app/browse/page.tsx` - Real API integration
+- `frontend/src/app/layout.tsx` - Added AuthProvider wrapper
+
+**Docker:**
+- `docker-compose.yml` - No changes needed (was already correct)
+- `docker-compose.dev.yml` - Simplified volume mounts
+- `frontend/Dockerfile` - Removed public directory copy
+- `frontend/Dockerfile.dev` - Changed npm ci to npm install
+
 ---
 
-**Status**: On track for MVP completion. All Phase 1-2 requirements met.
+**Status**: MVP fully operational. OCR pipeline end-to-end working. Ready for Phase 7+ features or AWS deployment.
