@@ -1,5 +1,6 @@
 """Main FastAPI application."""
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -7,7 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import auth, bundles, letters, pages, users
 from app.core.config import get_settings
+from app.services.storage import get_s3_storage
 
+logger = logging.getLogger(__name__)
 settings = get_settings()
 
 
@@ -15,8 +18,24 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     """Application lifespan handler."""
     # Startup
+    logger.info("Starting Letterbundle application...")
+
+    # Ensure S3 bucket exists
+    try:
+        storage = get_s3_storage()
+        if storage.ensure_bucket_exists():
+            logger.info(f"✓ S3 bucket '{storage.bucket_name}' is ready")
+        else:
+            logger.warning(
+                f"⚠️  Failed to ensure S3 bucket '{storage.bucket_name}' exists"
+            )
+    except Exception as e:
+        logger.warning(f"⚠️  Could not initialize S3 storage: {e}")
+
     yield
+
     # Shutdown
+    logger.info("Shutting down Letterbundle application")
 
 
 app = FastAPI(
