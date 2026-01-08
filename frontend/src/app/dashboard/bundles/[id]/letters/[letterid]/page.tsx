@@ -28,20 +28,6 @@ interface Page {
   transcription?: string
 }
 
-interface OCRStatus {
-  letter_id: string
-  status: string
-  has_transcription: boolean
-  transcription_preview?: string
-  total_pages: number
-  transcribed_pages: number
-  pages: Array<{
-    page_number: number
-    has_transcription: boolean
-    transcription_preview?: string
-  }>
-}
-
 export default function EditLetterPage() {
   const params = useParams()
   const bundleId = params.id as string
@@ -54,7 +40,6 @@ export default function EditLetterPage() {
   const [error, setError] = useState('')
   const [uploadError, setUploadError] = useState('')
   const [isUploading, setIsUploading] = useState(false)
-  const [ocrStatus, setOcrStatus] = useState<OCRStatus | null>(null)
   const [isOCRProcessing, setIsOCRProcessing] = useState(false)
   const [isEditingTranscription, setIsEditingTranscription] = useState(false)
   const [editedTranscription, setEditedTranscription] = useState('')
@@ -116,35 +101,6 @@ export default function EditLetterPage() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const loadOCRStatus = async () => {
-    if (!token || !letter) return
-
-    try {
-      const response = await fetch(`http://localhost:8000/api/letters/${letter.id}/ocr-status`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setOcrStatus(data)
-
-        // If processing is complete, stop polling
-        if (data.status === 'ready') {
-          setIsOCRProcessing(false)
-          if (pollIntervalRef.current) {
-            clearInterval(pollIntervalRef.current)
-          }
-          // Reload letter to get updated transcriptions
-          loadLetter()
-        }
-      }
-    } catch (err) {
-      console.error('Failed to load OCR status:', err)
-    }
-  }
-
   const startOCRPolling = () => {
     // Clear any existing interval
     if (pollIntervalRef.current) {
@@ -152,11 +108,31 @@ export default function EditLetterPage() {
     }
 
     setIsOCRProcessing(true)
-    loadOCRStatus()
 
-    // Poll every 2 seconds
-    pollIntervalRef.current = setInterval(() => {
-      loadOCRStatus()
+    // Poll every 2 seconds to check if transcription is available
+    pollIntervalRef.current = setInterval(async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/letters/${letter?.id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        })
+
+        if (response.ok) {
+          const updatedLetter = await response.json()
+          
+          // Check if transcription is now available
+          if (updatedLetter.transcription) {
+            setLetter(updatedLetter)
+            setIsOCRProcessing(false)
+            if (pollIntervalRef.current) {
+              clearInterval(pollIntervalRef.current)
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to check OCR status:', err)
+      }
     }, 2000)
   }
 
@@ -469,28 +445,6 @@ export default function EditLetterPage() {
                   >
                     {isOCRProcessing ? 'Processing...' : 'Run OCR Processing'}
                   </button>
-                </div>
-              )}
-
-              {ocrStatus && (
-                <div className="mt-6 pt-6 border-t">
-                  <p className="text-sm text-gray-600 mb-3">
-                    OCR Status: <span className="font-medium capitalize">{ocrStatus.status}</span>
-                  </p>
-                  <div className="bg-gray-50 p-3 rounded text-xs">
-                    <p className="text-gray-700">
-                      Transcribed {ocrStatus.transcribed_pages} of {ocrStatus.total_pages} pages
-                    </p>
-                    {ocrStatus.pages.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {ocrStatus.pages.map((page) => (
-                          <p key={page.page_number} className="text-gray-600">
-                            Page {page.page_number}: {page.has_transcription ? '✓ Done' : '⏳ Pending'}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 </div>
               )}
             </div>
