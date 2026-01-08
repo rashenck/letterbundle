@@ -28,7 +28,6 @@ class LetterUpdate(LetterBase):
     """Schema for updating a letter."""
 
     transcription: str | None = None
-    tags: list[str] | None = None
 
 
 class LetterReorder(BaseModel):
@@ -52,7 +51,6 @@ class LetterResponse(BaseModel):
     status: LetterStatus
     created_at: datetime
     updated_at: datetime
-    tags: list[str] = []
 
     model_config = {"from_attributes": True}
 
