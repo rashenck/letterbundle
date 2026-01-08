@@ -51,7 +51,7 @@ export default function CreateLetterPage() {
         throw new Error(data.detail || 'Failed to create letter')
       }
 
-      const letter = await response.json()
+      await response.json()
       router.push(`/dashboard/bundles/${bundleId}`)
     } catch (err: any) {
       setError(err.message || 'Failed to create letter')

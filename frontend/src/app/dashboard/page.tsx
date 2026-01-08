@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
-import { apiClient } from '@/lib/api'
 
 interface Bundle {
   id: string

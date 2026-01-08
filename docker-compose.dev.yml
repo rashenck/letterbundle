@@ -1,8 +1,6 @@
 # Development compose file - use with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 # This enables hot-reload and better development experience
 
-version: "3.8"
-
 services:
   frontend:
     build:

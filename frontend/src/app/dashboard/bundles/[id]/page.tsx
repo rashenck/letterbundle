@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
 
@@ -24,7 +24,6 @@ interface Letter {
 }
 
 export default function EditBundlePage() {
-  const router = useRouter()
   const params = useParams()
   const bundleId = params.id as string
   const { token } = useAuth()

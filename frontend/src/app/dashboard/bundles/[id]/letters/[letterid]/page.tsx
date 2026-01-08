@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
 
@@ -43,7 +43,6 @@ interface OCRStatus {
 }
 
 export default function EditLetterPage() {
-  const router = useRouter()
   const params = useParams()
   const bundleId = params.id as string
   const letterId = params.letterid as string
@@ -57,7 +56,6 @@ export default function EditLetterPage() {
   const [isUploading, setIsUploading] = useState(false)
   const [ocrStatus, setOcrStatus] = useState<OCRStatus | null>(null)
   const [isOCRProcessing, setIsOCRProcessing] = useState(false)
-  const [showTranscription, setShowTranscription] = useState(false)
   const [isEditingTranscription, setIsEditingTranscription] = useState(false)
   const [editedTranscription, setEditedTranscription] = useState('')
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
