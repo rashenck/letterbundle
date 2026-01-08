@@ -76,7 +76,7 @@ class LetterboxOCRService:
             logger.info(f"Processing page {page_number} with OCR...")
 
             # Process with Mistral
-            result: OCRResult = client.process_image(image_data)
+            result: OCRResult = client.process_image_bytes(image_data)
 
             logger.info(
                 f"✓ Page {page_number} OCR complete. "
