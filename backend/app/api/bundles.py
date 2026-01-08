@@ -24,7 +24,7 @@ async def list_my_bundles(
     db: Annotated[AsyncSession, Depends(get_db)],
     skip: int = 0,
     limit: int = 50,
-) -> BundleList:
+):
     """List current user's bundles."""
     # Get total count
     count_result = await db.execute(
@@ -42,7 +42,7 @@ async def list_my_bundles(
         .offset(skip)
         .limit(limit)
     )
-    bundles = result.scalars().all()
+    bundles = list(result.scalars().all())
 
     return BundleList(bundles=bundles, total=total)
 
