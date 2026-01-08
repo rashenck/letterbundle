@@ -520,14 +520,12 @@ export default function EditLetterPage() {
                   className="hidden"
                   id="file-input"
                 />
-                <label htmlFor="file-input">
-                  <button
-                    type="button"
-                    disabled={isUploading}
-                    className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 disabled:bg-gray-400 font-medium cursor-pointer"
-                  >
-                    {isUploading ? 'Uploading...' : 'Choose Files'}
-                  </button>
+                <label 
+                  htmlFor="file-input"
+                  className="inline-block bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 disabled:bg-gray-400 font-medium cursor-pointer"
+                  style={{ pointerEvents: isUploading ? 'none' : 'auto', opacity: isUploading ? 0.6 : 1 }}
+                >
+                  {isUploading ? 'Uploading...' : 'Choose Files'}
                 </label>
               </div>
             </div>
