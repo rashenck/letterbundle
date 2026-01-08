@@ -12,12 +12,8 @@ services:
     environment:
       - NODE_ENV=development
     volumes:
-      # Mount source code for hot reload
+      # Mount only source code for hot reload to avoid conflicts with Next.js generated files
       - ./frontend/src:/app/src
-      - ./frontend/public:/app/public
-      - ./frontend/next.config.js:/app/next.config.js
-      - ./frontend/package.json:/app/package.json
-      - ./frontend/tsconfig.json:/app/tsconfig.json
     depends_on:
       postgres:
         condition: service_healthy

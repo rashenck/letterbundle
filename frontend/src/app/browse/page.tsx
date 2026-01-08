@@ -3,13 +3,24 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
+interface User {
+  id: string
+  username: string
+  first_name: string
+  last_name: string
+  created_at: string
+}
+
 interface Bundle {
   id: string
   slug: string
   title: string
   description?: string
   user_id: string
+  user?: User
+  is_public: boolean
   created_at: string
+  updated_at: string
 }
 
 export default function BrowsePage() {
@@ -24,9 +35,16 @@ export default function BrowsePage() {
   const loadBundles = async () => {
     try {
       setIsLoading(true)
-      // This would be a public endpoint to get bundles
-      // For now, we'll just show an empty state
-      setBundles([])
+      setError('')
+      
+      const response = await fetch('http://localhost:8000/api/bundles/public')
+      
+      if (!response.ok) {
+        throw new Error('Failed to load bundles')
+      }
+      
+      const data = await response.json()
+      setBundles(data.bundles || [])
     } catch (err: any) {
       setError(err.message || 'Failed to load bundles')
     } finally {
@@ -74,17 +92,31 @@ export default function BrowsePage() {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {bundles.map((bundle) => (
-              <Link
-                key={bundle.id}
-                href={`/${bundle.slug}`}
-                className="bg-white rounded-lg shadow hover:shadow-lg transition p-6"
-              >
-                <h3 className="text-xl font-bold mb-2">{bundle.title}</h3>
-                <p className="text-gray-600 mb-4">{bundle.description || 'No description'}</p>
-                <p className="text-sm text-gray-400">
-                  Created {new Date(bundle.created_at).toLocaleDateString()}
-                </p>
-              </Link>
+              <div key={bundle.id} className="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden">
+                <Link
+                  href={`/${bundle.slug}`}
+                  className="block p-6 hover:bg-gray-50 transition"
+                >
+                  <h3 className="text-xl font-bold mb-2 text-gray-900">{bundle.title}</h3>
+                  <p className="text-gray-600 mb-4 line-clamp-2">{bundle.description || 'No description'}</p>
+                </Link>
+                <div className="px-6 pb-6 border-t border-gray-100 pt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="text-sm">
+                      {bundle.user ? (
+                        <Link href={`/users/${bundle.user.username}`} className="text-primary-600 hover:text-primary-700 font-medium">
+                          {bundle.user.first_name} {bundle.user.last_name}
+                        </Link>
+                      ) : (
+                        <span className="text-gray-600">Unknown author</span>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    {new Date(bundle.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
             ))}
           </div>
         )}
