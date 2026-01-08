@@ -20,23 +20,127 @@ from app.api.deps import get_current_user, get_current_user_optional
 from app.core.database import get_db
 from app.models import Bundle, Letter, LetterPage, LetterStatus, LetterTag, User
 from app.schemas.letter import (
-    LetterCreate,
-    LetterReorder,
     LetterResponse,
     LetterUpdate,
     LetterWithPages,
 )
 from app.schemas.page import PageResponse
 from app.services.image_processing import ImageProcessor
+from app.services.ocr import get_ocr_service
 from app.services.storage import get_s3_storage
 
 router = APIRouter()
 
 
 async def run_ocr_for_letter(letter_id: uuid.UUID) -> None:
-    """Background task to run OCR on letter pages."""
-    # TODO: Implement OCR processing
-    pass
+    """Background task to run OCR on letter pages.
+
+    This task:
+    1. Fetches letter and pages from database
+    2. Downloads original images from S3
+    3. Processes each page with Mistral OCR
+    4. Updates database with page-level and letter-level transcriptions
+    5. Updates letter status to READY
+    """
+    from app.core.database import async_session_maker
+
+    db_session = None
+    try:
+        print(f"Starting OCR processing for letter {letter_id}")
+
+        # Get OCR service and check availability
+        ocr_service = get_ocr_service()
+        if not ocr_service.is_available():
+            print("⚠️  OCR service not available (Mistral API key not configured)")
+            return
+
+        print("✓ OCR service is available")
+
+        # Create a fresh database session for this background task
+        db_session = async_session_maker()
+
+        # Fetch letter with pages
+        result = await db_session.execute(select(Letter).where(Letter.id == letter_id))
+        letter = result.scalar_one_or_none()
+
+        if not letter:
+            print(f"⚠️  Letter {letter_id} not found")
+            return
+
+        # Fetch letter pages
+        pages_result = await db_session.execute(
+            select(LetterPage)
+            .where(LetterPage.letter_id == letter_id)
+            .order_by(LetterPage.page_number)
+        )
+        pages = pages_result.scalars().all()
+
+        if not pages:
+            print(f"⚠️  No pages found for letter {letter_id}")
+            # Update status to ready even without pages
+            letter.status = "ready"
+            await db_session.commit()
+            return
+
+        print(f"Found {len(pages)} pages to process")
+
+        # Initialize S3 storage
+        storage = get_s3_storage()
+
+        # Process each page
+        page_transcriptions = []
+        for page in pages:
+            try:
+                print(f"Processing page {page.page_number}...")
+
+                # Download original image from S3
+                image_data = storage.download_file(page.s3_key_original)
+                if not image_data:
+                    print(f"⚠️  Failed to download image for page {page.page_number}")
+                    continue
+
+                # Process with OCR
+                ocr_result = await ocr_service.process_page(
+                    image_data, page_number=page.page_number
+                )
+
+                # Store page-level transcription
+                page.transcription = ocr_result["text"]
+                text_length = len(ocr_result["text"])
+                print(f"✓ Page {page.page_number} transcribed ({text_length} chars)")
+                page_transcriptions.append(ocr_result["text"])
+
+            except Exception as e:
+                print(f"Error processing page {page.page_number}: {e}")
+                # Continue with next page
+                continue
+
+        # Update database with page transcriptions
+        if page_transcriptions:
+            # Combine all page transcriptions into letter transcription
+            combined_text = "\n\n---\n\n".join(page_transcriptions)
+            letter.transcription = combined_text
+            letter.status = "ready"
+            print(f"✓ Letter transcription combined ({len(combined_text)} chars)")
+        else:
+            # No pages were successfully processed
+            print("⚠️  No pages were successfully transcribed")
+            letter.status = "ready"  # Mark as ready anyway
+
+        # Commit all changes
+        await db_session.commit()
+        print(f"✓ OCR processing complete for letter {letter_id}")
+
+    except Exception as e:
+        print(f"Error in OCR background task for letter {letter_id}: {e}")
+        import traceback
+
+        traceback.print_exc()
+
+    finally:
+        # Clean up database session
+        if db_session:
+            await db_session.close()
 
 
 @router.get("/{letter_id}", response_model=LetterWithPages)
