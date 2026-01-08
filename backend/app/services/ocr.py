@@ -1,6 +1,7 @@
 """OCR service for processing letter page images."""
 
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -14,12 +15,39 @@ from openletterbox.ocr import OCRClient, OCRResult  # noqa: E402
 logger = logging.getLogger(__name__)
 
 
+def _get_api_key() -> str | None:
+    """Get Mistral API key from file or environment.
+
+    Looks for the key in this order:
+    1. MISTRAL_API_KEY environment variable
+    2. .mistral.ai.key file, searching up the directory tree
+    """
+    # Check environment variable first
+    if api_key := os.getenv("MISTRAL_API_KEY"):
+        return api_key
+
+    # Search for .mistral.ai.key file starting from current directory
+    # and going up to parent directories
+    current = Path.cwd()
+    for _ in range(10):  # Search up to 10 levels deep
+        key_file = current / ".mistral.ai.key"
+        if key_file.exists():
+            return key_file.read_text().strip()
+        # Go up one directory
+        parent = current.parent
+        if parent == current:  # Reached root
+            break
+        current = parent
+
+    return None
+
+
 class LetterboxOCRService:
     """Service for OCR processing of letter pages."""
 
     def __init__(self, api_key: str | None = None):
         """Initialize OCR service with Mistral API."""
-        self.api_key = api_key
+        self.api_key = api_key or _get_api_key()
         self.client: OCRClient | None = None
 
     def _get_client(self) -> OCRClient:
