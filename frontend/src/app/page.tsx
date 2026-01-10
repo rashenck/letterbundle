@@ -40,18 +40,20 @@ export default function Home() {
             Transform your cherished letter collections into searchable digital archives. 
             Keep them safe, share them with family, and make them discoverable.
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link 
               href="/register"
-              className="bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition"
+              className="bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition transform hover:scale-105 w-full sm:w-auto"
             >
               Get Started Free
+              <span className="block ml-2 text-sm">✨ Join the community</span>
             </Link>
             <Link 
               href="/browse"
-              className="border-2 border-primary-600 text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-primary-50 transition"
+              className="border-2 border-primary-600 text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-primary-50 transition transform hover:scale-105 w-full sm:w-auto"
             >
               Browse Collections
+              <span className="block ml-2 text-sm">📚 Explore shared stories</span>
             </Link>
           </div>
         </div>
@@ -60,30 +62,35 @@ export default function Home() {
       {/* Features Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center mb-12">Why Letterbundle?</h3>
+          <h3 className="text-3xl font-bold text-center mb-8">Why Letterbundle?</h3>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 title: 'Automatic OCR',
-                description: 'Handwritten text is automatically transcribed using AI, making letters searchable.'
+                description: 'Handwritten text is automatically transcribed using AI, making letters searchable.',
+                icon: '🤖'
               },
               {
                 title: 'Beautiful Collections',
-                description: 'Organize letters into themed bundles and share them with friends and family.'
+                description: 'Organize letters into themed bundles and share them with friends and family.',
+                icon: '📚'
               },
               {
                 title: 'Preserved Forever',
-                description: 'Your letters are backed up securely in the cloud, protected for generations.'
+                description: 'Your letters are backed up securely in the cloud, protected for generations.',
+                icon: '🔐'
               }
-            ].map((feature) => (
-              <div key={feature.title} className="bg-white p-8 rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-3">{feature.title}</h4>
-                <p className="text-gray-600">{feature.description}</p>
+            ].map((feature, index) => (
+              <div key={feature.title} className="bg-white p-8 rounded-lg shadow hover:shadow-lg transition-shadow duration-300">
+                <div className="text-6xl mb-4 text-center text-primary-600">
+                  {feature.icon}
+                </div>
+                <h4 className="text-xl font-bold mb-3 text-gray-900">{feature.title}</h4>
+                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">

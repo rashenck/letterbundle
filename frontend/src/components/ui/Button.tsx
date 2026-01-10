@@ -1,0 +1,67 @@
+import { ButtonHTMLAttributes, forwardRef } from 'react'
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
+  size?: 'sm' | 'md' | 'lg'
+  loading?: boolean
+  disabled?: boolean
+  children: React.ReactNode
+}
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  { 
+    variant = 'primary',
+    size = 'md', 
+    loading = false,
+    disabled = false,
+    className = '',
+    children,
+    ...props
+  }, 
+  ref
+) => {
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2'
+  
+  const variantClasses = {
+    primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500',
+    secondary: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500',
+    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+    ghost: 'bg-transparent text-primary-600 hover:bg-primary-50 focus:ring-primary-500'
+  }
+  
+  const sizeClasses = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-6 py-3 text-base'
+  }
+  
+  const stateClasses = loading || disabled ? 'opacity-50 cursor-not-allowed' : ''
+  
+  const classes = `
+    ${baseClasses}
+    ${variantClasses[variant]}
+    ${sizeClasses[size]}
+    ${stateClasses}
+    ${className}
+  `.trim()
+  
+  return (
+    <button
+      ref={ref}
+      className={classes}
+      disabled={disabled || loading}
+      {...props}
+    >
+      {loading ? (
+        <svg className="animate-spin -ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path fill="currentColor" d="M4 12a8 8 0 0-8 0-8 8v8a8 8 0 016 0 16-8 8z"></path>
+        </svg>
+      ) : (
+        children
+      )}
+    </button>
+  )
+}
+
+Button.displayName = 'Button'
