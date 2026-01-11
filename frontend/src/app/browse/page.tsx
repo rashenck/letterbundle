@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { Card } from '@/components/ui'
+import { EmptyState } from '@/components/ui'
 
 interface User {
   id: string
@@ -80,16 +82,16 @@ export default function BrowsePage() {
           </div>
         )}
 
-        {isLoading ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">Loading collections...</p>
-          </div>
-        ) : bundles.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-lg">
-            <p className="text-gray-500 mb-4">No public collections yet</p>
-            <p className="text-gray-400">Be the first to share your letter collection!</p>
-          </div>
-        ) : (
+          {isLoading ? (
+            <SkeletonLoader />
+          ) : bundles.length === 0 ? (
+            <EmptyState
+              title="No Public Collections"
+              description="Be the first to share your letter collection with the community!"
+              actionText="Create a Collection"
+              actionHref="/dashboard/bundles/new"
+            />
+          ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {bundles.map((bundle) => (
               <div key={bundle.id} className="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden">

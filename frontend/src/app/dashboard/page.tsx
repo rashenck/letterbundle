@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
+import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui'
 
 interface Bundle {
   id: string
@@ -72,70 +73,115 @@ export default function DashboardPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">My Collections</h1>
-        <Link
-          href="/dashboard/bundles/new"
-          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700"
-        >
-          Create Collection
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">My Collections</h1>
+          <p className="text-gray-600 mt-1">Manage your letter collections and share them with the world</p>
+        </div>
+        <Link href="/dashboard/bundles/new">
+          <Button>
+            📝 Create Collection
+          </Button>
         </Link>
       </div>
 
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded">
-          {error}
-        </div>
+        <Card variant="outlined" className="mb-6 border-red-200 bg-red-50">
+          <CardContent>
+            <p className="text-red-700">❌ {error}</p>
+          </CardContent>
+        </Card>
       )}
 
       {isLoading ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500">Loading collections...</p>
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader>
+                <div className="h-5 bg-gray-200 rounded w-1/3 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+                <div className="flex gap-2">
+                  <div className="h-6 bg-gray-200 rounded w-16"></div>
+                  <div className="h-6 bg-gray-200 rounded w-20"></div>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <div className="flex gap-2">
+                  <div className="h-8 bg-gray-200 rounded w-16"></div>
+                  <div className="h-8 bg-gray-200 rounded w-16"></div>
+                </div>
+              </CardFooter>
+            </Card>
+          ))}
         </div>
       ) : bundles.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500 mb-4">You haven't created any collections yet.</p>
-          <Link
-            href="/dashboard/bundles/new"
-            className="text-primary-600 hover:text-primary-700 font-semibold"
-          >
-            Create your first collection
-          </Link>
-        </div>
+        <Card className="text-center py-12">
+          <CardContent>
+            <div className="text-6xl mb-4">📚</div>
+            <CardTitle>You haven't created any collections yet</CardTitle>
+            <CardDescription className="mb-6">
+              Start preserving your family's letter heritage by creating your first collection
+            </CardDescription>
+            <Link href="/dashboard/bundles/new">
+              <Button>
+                ✨ Create Your First Collection
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {bundles.map((bundle) => (
-            <div key={bundle.id} className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <Link
-                    href={`/dashboard/bundles/${bundle.id}`}
-                    className="text-xl font-bold text-primary-600 hover:text-primary-700"
-                  >
-                    {bundle.title}
-                  </Link>
-                  <p className="text-gray-600 mt-1">{bundle.description || 'No description'}</p>
-                  <div className="flex gap-4 mt-3 text-sm text-gray-500">
-                    <span>Slug: <code className="bg-gray-100 px-2 py-1 rounded">{bundle.slug}</code></span>
-                    <span>Status: {bundle.is_public ? '🌍 Public' : '🔒 Private'}</span>
-                    <span>Updated: {new Date(bundle.updated_at).toLocaleDateString()}</span>
+            <Card key={bundle.id} className="group hover:shadow-lg transition-all duration-200">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-xl">
+                      <Link
+                        href={`/dashboard/bundles/${bundle.id}`}
+                        className="hover:text-primary-700 transition-colors"
+                      >
+                        {bundle.title}
+                      </Link>
+                    </CardTitle>
+                    <CardDescription className="mt-2">
+                      {bundle.description || 'No description provided'}
+                    </CardDescription>
+                  </div>
+                  <div className="text-2xl ml-4">
+                    {bundle.is_public ? '🌍' : '🔒'}
                   </div>
                 </div>
-                <div className="flex gap-2 ml-4">
-                  <Link
-                    href={`/dashboard/bundles/${bundle.id}`}
-                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(bundle.id)}
-                    className="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
-                  >
-                    Delete
-                  </button>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400">🔗</span>
+                    <code className="bg-gray-100 px-2 py-1 rounded text-xs">
+                      {bundle.slug}
+                    </code>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400">📅</span>
+                    <span>Updated {new Date(bundle.updated_at).toLocaleDateString()}</span>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+              <CardFooter>
+                <div className="flex gap-2 w-full">
+                  <Link href={`/dashboard/bundles/${bundle.id}`} className="flex-1">
+                    <Button variant="secondary" className="w-full">
+                      📖 View
+                    </Button>
+                  </Link>
+                  <Button variant="danger" onClick={() => handleDelete(bundle.id)} className="flex-1">
+                    🗑️ Delete
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
           ))}
         </div>
       )}
