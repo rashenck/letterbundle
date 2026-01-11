@@ -47,7 +47,7 @@ export default function DashboardLayout({
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
            <div className="flex justify-between items-center h-16">
              <Link href="/" className="text-2xl font-bold text-primary-600 hover:text-primary-700 transition-colors">
-               📝 Letterbundle
+               📝 LetterBundle
              </Link>
 
              <div className="flex items-center gap-4">

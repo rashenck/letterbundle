@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Card } from '@/components/ui'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, SkeletonLoader } from '@/components/ui'
 
 interface User {
   id: string
@@ -61,7 +60,7 @@ export default function BrowsePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="text-2xl font-bold text-primary-600">
-              Letterbundle
+              LetterBundle
             </Link>
             <div className="flex gap-4">
               <Link href="/login" className="text-gray-700 hover:text-primary-600">

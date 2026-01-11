@@ -11,7 +11,7 @@ export default function Home() {
                <Link href="/" className="flex items-center group">
                  <span className="text-3xl mr-2 group-hover:animate-bounce">📝</span>
                  <h1 className="text-2xl font-bold text-primary-600 group-hover:text-primary-700 transition-colors">
-                   Letterbundle
+                   LetterBundle
                  </h1>
                </Link>
              </div>
@@ -74,7 +74,7 @@ export default function Home() {
        {/* Features Section */}
        <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
          <div className="max-w-6xl mx-auto px-4">
-           <h3 className="text-4xl font-bold text-center mb-4 text-gray-900">Why Letterbundle?</h3>
+           <h3 className="text-4xl font-bold text-center mb-4 text-gray-900">Why LetterBundle?</h3>
            <p className="text-xl text-center text-gray-600 mb-16 max-w-2xl mx-auto">
              Discover the features that make preserving family letters meaningful and accessible
            </p>
@@ -115,7 +115,7 @@ export default function Home() {
        <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-16">
          <div className="max-w-6xl mx-auto px-4 text-center">
            <div className="mb-8">
-             <h4 className="text-2xl font-bold mb-2">Letterbundle</h4>
+             <h4 className="text-2xl font-bold mb-2">LetterBundle</h4>
              <p className="text-gray-300 max-w-md mx-auto">
                Preserving memories one letter at a time. Join our community of family historians.
              </p>
@@ -126,7 +126,7 @@ export default function Home() {
               <Link href="/about" className="hover:text-primary-300 transition-colors">About</Link>
             </div>
            <div className="border-t border-gray-700 pt-8">
-             <p className="text-gray-400">© 2026 Letterbundle. Made with ❤️ for family stories.</p>
+             <p className="text-gray-400">© 2026 LetterBundle. Made with ❤️ for family stories.</p>
            </div>
          </div>
        </footer>

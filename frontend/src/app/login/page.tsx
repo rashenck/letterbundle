@@ -31,7 +31,7 @@ export default function LoginPage() {
         <div className="bg-white shadow-xl rounded-xl p-8 border border-gray-100">
           <Link href="/" className="block text-center mb-8">
             <div className="text-6xl mb-2">📝</div>
-            <h1 className="text-3xl font-bold text-primary-600">Letterbundle</h1>
+            <h1 className="text-3xl font-bold text-primary-600">LetterBundle</h1>
           </Link>
 
           <div className="text-center mb-8">

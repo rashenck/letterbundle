@@ -68,12 +68,12 @@ export default function RegisterPage() {
         <div className="bg-white shadow-xl rounded-xl p-8 border border-gray-100">
           <Link href="/" className="block text-center mb-8">
             <div className="text-6xl mb-2">📝</div>
-            <h1 className="text-3xl font-bold text-primary-600">Letterbundle</h1>
+            <h1 className="text-3xl font-bold text-primary-600">LetterBundle</h1>
           </Link>
 
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Join the community</h2>
-            <p className="text-gray-600">Start preserving your family's letter heritage</p>
+            <p className="text-gray-600">Keep written memories alive</p>
           </div>
 
           {error && (
@@ -207,7 +207,7 @@ export default function RegisterPage() {
               </label>
             </div>
 
-            <Button type="submit" disabled={isLoading} className="w-full py-3 text-lg">
+            <Button type="submit" disabled={isLoading || !formData.acceptTerms || !formData.first_name || !formData.last_name || !formData.email || !formData.username || !formData.password || !formData.confirmPassword || formData.password !== formData.confirmPassword} className="w-full py-3 text-lg">
               {isLoading ? (
                 <>
                   <Spinner size="sm" className="mr-2" />
