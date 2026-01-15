@@ -1,6 +1,6 @@
-# Letterbundle Backend
+# LetterBundle Backend
 
-FastAPI backend for the Letterbundle platform.
+FastAPI backend for the LetterBundle platform.
 
 ## Setup
 

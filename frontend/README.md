@@ -1,6 +1,6 @@
-# Letterbundle Frontend
+# LetterBundle Frontend
 
-Next.js + TypeScript + Tailwind CSS frontend for the Letterbundle application.
+Next.js + TypeScript + Tailwind CSS frontend for the LetterBundle application.
 
 ## Setup
 

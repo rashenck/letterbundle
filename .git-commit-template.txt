@@ -1,0 +1,71 @@
+# Commit Message Template
+
+Use this template for all commits to ensure consistent, informative commit messages.
+
+## Format
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+## Types
+
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation only changes
+- **style**: Changes that do not affect the meaning of the code (white-space, formatting, etc.)
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance
+- **test**: Adding missing tests or correcting existing tests
+- **build**: Changes that affect the build system or external dependencies
+- **ci**: Changes to CI configuration files and scripts
+- **chore**: Other changes that don't modify src or test files
+- **revert**: Reverts a previous commit
+
+## Description
+
+- Use imperative mood: "Add", "Fix", "Update", not "Added", "Fixed", "Updated"
+- Keep under 72 characters
+- Start with lowercase letter
+- No period at the end
+
+## Body (Optional)
+
+- Explain what and why, not how
+- Separate from description with blank line
+- Wrap at 72 characters
+
+## Footer (Optional)
+
+- Reference issues: `Closes #123`
+- Breaking changes: `BREAKING CHANGE: description`
+
+## Examples
+
+```
+feat: add user authentication with JWT tokens
+
+Implement secure login system using JSON Web Tokens for stateless
+authentication. Includes registration, login, logout, and protected
+routes middleware.
+
+Closes #42
+```
+
+```
+fix: resolve OCR status polling issue
+
+Change polling to use letter endpoint instead of non-existent
+ocr-status endpoint, ensuring transcription appears in UI.
+```
+
+```
+docs: update API documentation with examples
+
+Add comprehensive request/response examples and error handling
+documentation for all endpoints.
+```

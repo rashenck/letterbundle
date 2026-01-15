@@ -1,4 +1,4 @@
-# Letterbundle - Implementation Plan
+# LetterBundle - Implementation Plan
 
 **Domain:** letterbundle.com
 
