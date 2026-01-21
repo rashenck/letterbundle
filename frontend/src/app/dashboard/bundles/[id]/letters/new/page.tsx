@@ -18,12 +18,20 @@ export default function CreateLetterPage() {
     location: '',
     notes: '',
   })
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files) {
+      setSelectedFiles(Array.from(files))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +45,9 @@ export default function CreateLetterPage() {
 
     try {
       setIsLoading(true)
-      const response = await fetch(`http://localhost:8000/api/bundles/${bundleId}/letters`, {
+
+      // Step 1: Create the letter
+      const createResponse = await fetch(`http://localhost:8000/api/bundles/${bundleId}/letters`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -46,13 +56,36 @@ export default function CreateLetterPage() {
         body: JSON.stringify(formData),
       })
 
-      if (!response.ok) {
-        const data = await response.json()
+      if (!createResponse.ok) {
+        const data = await createResponse.json()
         throw new Error(data.detail || 'Failed to create letter')
       }
 
-      await response.json()
-      router.push(`/dashboard/bundles/${bundleId}`)
+      const createdLetter = await createResponse.json()
+
+      // Step 2: Upload files if any were selected
+      if (selectedFiles.length > 0) {
+        const formDataToSend = new FormData()
+        selectedFiles.forEach((file) => {
+          formDataToSend.append('files', file)
+        })
+
+        const uploadResponse = await fetch(`http://localhost:8000/api/letters/${createdLetter.id}/pages`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formDataToSend,
+        })
+
+        if (!uploadResponse.ok) {
+          console.warn('Letter created but file upload failed')
+          // Don't throw error - letter was created successfully
+        }
+      }
+
+      // Step 3: Redirect to edit page
+      router.push(`/dashboard/bundles/${bundleId}/letters/${createdLetter.id}`)
     } catch (err: any) {
       setError(err.message || 'Failed to create letter')
     } finally {
@@ -159,9 +192,46 @@ export default function CreateLetterPage() {
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Upload Page Images
+            </label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+              <div className="text-center">
+                <p className="text-gray-600 mb-4">
+                  📄 Drop letter page images here or click to select
+                </p>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={isLoading}
+                  className="hidden"
+                  id="file-input"
+                />
+                <label
+                  htmlFor="file-input"
+                  className="inline-block bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 disabled:bg-gray-400 font-medium cursor-pointer"
+                  style={{ pointerEvents: isLoading ? 'none' : 'auto', opacity: isLoading ? 0.6 : 1 }}
+                >
+                  Choose Files
+                </label>
+                {selectedFiles.length > 0 && (
+                  <p className="text-sm text-gray-600 mt-2">
+                    {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} selected
+                  </p>
+                )}
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 mt-2">
+              Supported formats: JPG, PNG, GIF. Max 10MB per image. You can upload more pages after creation.
+            </p>
+          </div>
+
           <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
             <p className="text-sm text-blue-800">
-              💡 <strong>Next Step:</strong> After creating this letter, you'll be able to upload the page images 
+              💡 <strong>Next:</strong> After creating this letter, you'll be taken to the edit page where you can upload additional pages
               and we'll automatically transcribe the handwritten text using AI.
             </p>
           </div>
@@ -172,7 +242,7 @@ export default function CreateLetterPage() {
               disabled={isLoading}
               className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 disabled:bg-gray-400 font-medium"
             >
-              {isLoading ? 'Creating...' : 'Create Letter'}
+              {isLoading ? (selectedFiles.length > 0 ? 'Creating & Uploading...' : 'Creating...') : 'Create Letter'}
             </button>
             <Link
               href={`/dashboard/bundles/${bundleId}`}

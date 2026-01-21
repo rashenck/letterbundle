@@ -67,3 +67,5 @@ postgres_data/
 *.pem
 *.key
 .mistral.ai.key
+
+docker-compose.dev.yml

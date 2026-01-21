@@ -95,6 +95,9 @@ class S3Storage:
                 Params={"Bucket": self.bucket_name, "Key": s3_key},
                 ExpiresIn=expiration_seconds,
             )
+            # Replace internal Docker hostname with localhost for browser access
+            if url:
+                url = url.replace("localstack:4566", "localhost:4566")
             return url
         except ClientError as e:
             print(f"Error generating presigned URL: {e}")

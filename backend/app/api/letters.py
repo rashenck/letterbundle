@@ -94,15 +94,19 @@ async def run_ocr_for_letter(letter_id: uuid.UUID) -> None:
                 print(f"Processing page {page.page_number}...")
 
                 # Download original image from S3
+                print(f"Downloading image from S3: {page.s3_key_original}")
                 image_data = storage.download_file(page.s3_key_original)
                 if not image_data:
                     print(f"⚠️  Failed to download image for page {page.page_number}")
                     continue
+                print(f"✓ Downloaded image ({len(image_data)} bytes)")
 
                 # Process with OCR
+                print(f"Calling Mistral OCR API for page {page.page_number}...")
                 ocr_result = await ocr_service.process_page(
                     image_data, page_number=page.page_number
                 )
+                print(f"✓ OCR API call completed for page {page.page_number}")
 
                 # Store page-level transcription
                 page.transcription = ocr_result["text"]

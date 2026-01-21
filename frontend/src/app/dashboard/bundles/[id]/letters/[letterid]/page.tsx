@@ -43,6 +43,7 @@ export default function EditLetterPage() {
   const [isOCRProcessing, setIsOCRProcessing] = useState(false)
   const [isEditingTranscription, setIsEditingTranscription] = useState(false)
   const [editedTranscription, setEditedTranscription] = useState('')
+  const [pageImageUrls, setPageImageUrls] = useState<Record<string, string>>({})
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const [formData, setFormData] = useState({
     date_written: '',
@@ -160,6 +161,40 @@ export default function EditLetterPage() {
     }
   }
 
+  const fetchPageImageUrls = async () => {
+    if (!token || pages.length === 0) return
+
+    try {
+      const urls: Record<string, string> = {}
+      for (const page of pages) {
+        try {
+          const response = await fetch(`http://localhost:8000/api/pages/${page.id}/image/thumbnail`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          })
+          if (response.ok) {
+            const data = await response.json()
+            urls[page.id] = data.url
+          }
+        } catch (error) {
+          console.warn(`Failed to get thumbnail URL for page ${page.id}:`, error)
+        }
+      }
+      setPageImageUrls(urls)
+    } catch (err) {
+      console.error('Failed to fetch page image URLs:', err)
+    }
+  }
+
+  const handleEditTranscription = async () => {
+    if (!letter) return
+    setEditedTranscription(letter.transcription || '')
+    setIsEditingTranscription(true)
+    // Fetch image URLs for reference
+    await fetchPageImageUrls()
+  }
+
   const handleSaveTranscription = async () => {
     if (!token || !letter) return
 
@@ -190,6 +225,7 @@ export default function EditLetterPage() {
       }))
       setIsEditingTranscription(false)
       setEditedTranscription('')
+      setPageImageUrls({})
       alert('Transcription saved successfully!')
     } catch (err: any) {
       setError(err.message || 'Failed to save transcription')
@@ -391,13 +427,50 @@ export default function EditLetterPage() {
               {letter.transcription ? (
                 <div>
                   {isEditingTranscription ? (
-                    <div className="space-y-4">
-                      <textarea
-                        value={editedTranscription}
-                        onChange={(e) => setEditedTranscription(e.target.value)}
-                        rows={8}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      />
+                    <div className="space-y-6">
+                      {/* Page Images for Reference */}
+                      {pages.length > 0 && (
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-700 mb-3">Reference Images:</h3>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            {pages.map((page) => (
+                              <div key={page.id} className="text-center">
+                                <div className="bg-gray-100 rounded-lg p-2 mb-2">
+                                  {pageImageUrls[page.id] ? (
+                                    <img
+                                      src={pageImageUrls[page.id]}
+                                      alt={`Page ${page.page_number}`}
+                                      className="w-full h-24 object-contain rounded"
+                                      onError={(e) => {
+                                        // Hide broken images
+                                        (e.target as HTMLImageElement).style.display = 'none';
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="w-full h-24 bg-gray-200 rounded flex items-center justify-center">
+                                      <span className="text-xs text-gray-500">No image</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <p className="text-xs text-gray-600">Page {page.page_number}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Editable Transcription */}
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-700 mb-2">Edit Transcription:</h3>
+                        <textarea
+                          value={editedTranscription}
+                          onChange={(e) => setEditedTranscription(e.target.value)}
+                          rows={12}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono text-sm"
+                          placeholder="Edit the transcribed text here..."
+                        />
+                      </div>
+
                       <div className="flex gap-3">
                         <button
                           onClick={handleSaveTranscription}
@@ -409,6 +482,7 @@ export default function EditLetterPage() {
                           onClick={() => {
                             setIsEditingTranscription(false)
                             setEditedTranscription('')
+                            setPageImageUrls({})
                           }}
                           className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 font-medium"
                         >
@@ -423,15 +497,12 @@ export default function EditLetterPage() {
                           {letter.transcription}
                         </p>
                       </div>
-                      <button
-                        onClick={() => {
-                          setEditedTranscription(letter.transcription || '')
-                          setIsEditingTranscription(true)
-                        }}
-                        className="text-primary-600 hover:text-primary-700 font-medium"
-                      >
-                        Edit Transcription
-                      </button>
+                       <button
+                         onClick={handleEditTranscription}
+                         className="text-primary-600 hover:text-primary-700 font-medium"
+                       >
+                         Edit Transcription
+                       </button>
                     </div>
                   )}
                 </div>

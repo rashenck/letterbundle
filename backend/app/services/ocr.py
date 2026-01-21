@@ -374,6 +374,6 @@ _ocr_service: LetterboxOCRService | None = None
 def get_ocr_service(api_key: str | None = None) -> LetterboxOCRService:
     """Get or create OCR service instance."""
     global _ocr_service
-    if _ocr_service is None:
+    if _ocr_service is None or not _ocr_service.is_available():
         _ocr_service = LetterboxOCRService(api_key=api_key)
     return _ocr_service
