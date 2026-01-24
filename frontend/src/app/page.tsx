@@ -16,12 +16,12 @@ export default function Home() {
                </Link>
              </div>
              <div className="flex gap-6">
-               <Link href="/browse" className="text-gray-700 hover:text-primary-600 font-medium transition-colors hover:underline">
-                 Browse
-               </Link>
-               <Link href="/login" className="text-gray-700 hover:text-primary-600 font-medium transition-colors hover:underline">
-                 Login
-               </Link>
+                <Link href="/browse" className="text-gray-700 hover:text-primary-600 font-medium transition-colors hover:underline py-2">
+                  Browse
+                </Link>
+                <Link href="/login" className="text-gray-700 hover:text-primary-600 font-medium transition-colors hover:underline py-2">
+                  Login
+                </Link>
                <Link
                  href="/register"
                  className="bg-primary-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-700 hover:shadow-lg transition-all transform hover:scale-105"
@@ -65,10 +65,9 @@ export default function Home() {
                </span>
              </Link>
            </div>
-         </div>
-         {/* Decorative elements */}
-         <div className="absolute top-20 left-10 text-6xl opacity-10 animate-bounce">📜</div>
-         <div className="absolute bottom-20 right-10 text-6xl opacity-10 animate-bounce animation-delay-1000">✉️</div>
+          </div>
+          {/* Decorative elements */}
+          <div className="absolute bottom-20 right-10 text-6xl opacity-10 animate-bounce animation-delay-1000">✉️</div>
        </section>
 
        {/* Features Section */}
@@ -80,24 +79,24 @@ export default function Home() {
            </p>
            <div className="grid md:grid-cols-3 gap-8">
              {[
-               {
-                 title: 'Automatic OCR',
-                 description: 'Handwritten text is automatically transcribed using AI, making letters searchable and accessible to everyone.',
-                 icon: '🤖',
-                 color: 'from-blue-500 to-cyan-500'
-               },
+                {
+                  title: 'Automatic Transcribing',
+                  description: 'Handwritten text is automatically transcribed using AI, making letters searchable and accessible to everyone.',
+                  icon: '🤖',
+                  color: 'from-blue-500 to-cyan-500'
+                },
                {
                  title: 'Beautiful Collections',
                  description: 'Organize letters into themed bundles and share them with friends and family in stunning digital galleries.',
                  icon: '📚',
                  color: 'from-green-500 to-emerald-500'
                },
-               {
-                 title: 'Preserved Forever',
-                 description: 'Your letters are backed up securely in the cloud, protected and accessible for generations to come.',
-                 icon: '🔐',
-                 color: 'from-purple-500 to-pink-500'
-               }
+                {
+                  title: 'Share with Loved Ones',
+                  description: 'Share your letter collections with family and friends, creating meaningful connections across generations.',
+                  icon: '👥',
+                  color: 'from-purple-500 to-pink-500'
+                }
              ].map((feature) => (
                <div key={feature.title} className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 group">
                  <div className={`w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-r ${feature.color} flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300`}>

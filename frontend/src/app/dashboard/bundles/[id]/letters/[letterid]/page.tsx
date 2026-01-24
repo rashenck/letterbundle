@@ -415,7 +415,7 @@ export default function EditLetterPage() {
           {pages.length > 0 && (
             <div className="bg-white rounded-lg shadow p-8 mb-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold">Transcription (OCR)</h2>
+                <h2 className="text-xl font-bold">Transcription</h2>
                 {isOCRProcessing && (
                   <div className="flex items-center gap-2 text-blue-600">
                     <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
@@ -514,7 +514,7 @@ export default function EditLetterPage() {
                     disabled={isOCRProcessing}
                     className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-medium"
                   >
-                    {isOCRProcessing ? 'Processing...' : 'Run OCR Processing'}
+                    {isOCRProcessing ? 'Processing...' : 'Transcribe Letter'}
                   </button>
                 </div>
               )}
