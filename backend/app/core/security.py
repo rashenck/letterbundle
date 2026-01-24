@@ -7,14 +7,12 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from app.core.config import get_settings
+from app.core.constants import USERNAME_PATTERN
 
 settings = get_settings()
 
 # Use argon2 for password hashing (no length limitations)
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
-
-# Regex for validating slugs and usernames (lowercase letters and hyphens only)
-SLUG_PATTERN = re.compile(r"^[a-z][a-z\-]*[a-z]$|^[a-z]{1,2}$")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -69,10 +67,11 @@ def validate_slug(slug: str) -> tuple[bool, str | None]:
     if len(slug) > settings.max_slug_length:
         return False, f"Must be at most {settings.max_slug_length} characters"
 
-    if not SLUG_PATTERN.match(slug):
+    # Allow lowercase letters, numbers, and hyphens
+    if not USERNAME_PATTERN.match(slug):
         return (
             False,
-            "Must contain only lowercase letters (a-z) and hyphens, and start/end with a letter",
+            "Must contain only lowercase letters, numbers, and hyphens, and start/end with a letter or number",
         )
 
     if slug in settings.reserved_words:

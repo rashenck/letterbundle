@@ -1,13 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
 import { Button, Spinner } from '@/components/ui'
 
 export default function RegisterPage() {
-  const router = useRouter()
   const { register, isLoading } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
@@ -17,6 +15,7 @@ export default function RegisterPage() {
     first_name: '',
     last_name: '',
     acceptTerms: false,
+    submitted: false,
   })
   const [error, setError] = useState('')
 
@@ -56,7 +55,10 @@ export default function RegisterPage() {
         first_name: formData.first_name,
         last_name: formData.last_name,
       })
-      router.push('/dashboard')
+      
+      // Show verification message
+      setError('')
+      setFormData(prev => ({ ...prev, submitted: true }))
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.')
     }
@@ -72,7 +74,7 @@ export default function RegisterPage() {
           </Link>
 
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Join the community</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Join our community</h2>
             <p className="text-gray-600">Keep written memories alive</p>
           </div>
 
@@ -83,141 +85,164 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+          {formData.submitted ? (
+            <div className="text-center py-8">
+              <div className="text-5xl mb-4">✉️</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Check Your Email</h3>
+              <p className="text-gray-600 mb-4">
+                We've sent a verification link to<br />
+                <strong>{formData.email}</strong>
+              </p>
+              <p className="text-sm text-gray-500">
+                Click the link in the email to activate your account.<br />
+                If you don't see it, check your spam folder.
+              </p>
+              <div className="mt-6 space-y-2">
+                <button
+                  onClick={() => setFormData(prev => ({ ...prev, submitted: false, email: '' }))}
+                  className="text-primary-600 hover:text-primary-700 font-medium"
+                >
+                  Use different email
+                </button>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-2">
+                    👤 First Name
+                  </label>
+                  <input
+                    id="first_name"
+                    name="first_name"
+                    type="text"
+                    value={formData.first_name}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                    disabled={isLoading}
+                    placeholder="John"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-2">
+                    👤 Last Name
+                  </label>
+                  <input
+                    id="last_name"
+                    name="last_name"
+                    type="text"
+                    value={formData.last_name}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                    disabled={isLoading}
+                    placeholder="Doe"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-2">
-                  👤 First Name
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  📧 Email Address
                 </label>
                 <input
-                  id="first_name"
-                  name="first_name"
-                  type="text"
-                  value={formData.first_name}
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                   disabled={isLoading}
-                  placeholder="John"
+                  placeholder="john.doe@email.com"
                 />
               </div>
+
               <div>
-                <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-2">
-                  👤 Last Name
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                  🏷️ Username
                 </label>
                 <input
-                  id="last_name"
-                  name="last_name"
+                  id="username"
+                  name="username"
                   type="text"
-                  value={formData.last_name}
+                  value={formData.username}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                   disabled={isLoading}
-                  placeholder="Doe"
+                  placeholder="johndoe123"
+                />
+                <p className="text-xs text-gray-500 mt-1">Lowercase letters, numbers, and hyphens only (4-30 chars)</p>
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                  🔒 Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                  disabled={isLoading}
+                  placeholder="At least 8 characters"
                 />
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                📧 Email Address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-                disabled={isLoading}
-                placeholder="john.doe@email.com"
-              />
-            </div>
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                  🔒 Confirm Password
+                </label>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                  disabled={isLoading}
+                  placeholder="Repeat your password"
+                />
+              </div>
 
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                🏷️ Username
-              </label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                value={formData.username}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-                disabled={isLoading}
-                placeholder="johndoe123"
-              />
-              <p className="text-xs text-gray-500 mt-1">Lowercase letters, numbers, and hyphens only (4-30 chars)</p>
-            </div>
+              <div className="flex items-start space-x-3">
+                <input
+                  id="acceptTerms"
+                  name="acceptTerms"
+                  type="checkbox"
+                  checked={formData.acceptTerms}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  disabled={isLoading}
+                />
+                <label htmlFor="acceptTerms" className="text-sm text-gray-700">
+                  I agree to the{' '}
+                  <Link href="/terms" className="text-primary-600 hover:text-primary-700 font-medium hover:underline transition-colors">
+                    Terms & Privacy Policy
+                  </Link>
+                </label>
+              </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                🔒 Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-                disabled={isLoading}
-                placeholder="At least 8 characters"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                🔒 Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-                disabled={isLoading}
-                placeholder="Repeat your password"
-              />
-            </div>
-
-            <div className="flex items-start space-x-3">
-              <input
-                id="acceptTerms"
-                name="acceptTerms"
-                type="checkbox"
-                checked={formData.acceptTerms}
-                onChange={handleChange}
-                required
-                className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                disabled={isLoading}
-              />
-              <label htmlFor="acceptTerms" className="text-sm text-gray-700">
-                I agree to the{' '}
-                <Link href="/terms" className="text-primary-600 hover:text-primary-700 font-medium hover:underline transition-colors">
-                  Terms & Privacy Policy
-                </Link>
-              </label>
-            </div>
-
-            <Button type="submit" disabled={isLoading || !formData.acceptTerms || !formData.first_name || !formData.last_name || !formData.email || !formData.username || !formData.password || !formData.confirmPassword || formData.password !== formData.confirmPassword} className="w-full py-3 text-lg">
-              {isLoading ? (
-                <>
-                  <Spinner size="sm" className="mr-2" />
-                  Creating your account...
-                </>
-              ) : (
-                '🎉 Create Account'
-              )}
-            </Button>
-          </form>
+              <Button type="submit" disabled={isLoading || !formData.acceptTerms || !formData.first_name || !formData.last_name || !formData.email || !formData.username || !formData.password || !formData.confirmPassword || formData.password !== formData.confirmPassword} className="w-full py-3 text-lg">
+                {isLoading ? (
+                  <>
+                    <Spinner size="sm" className="mr-2" />
+                    Creating your account...
+                  </>
+                ) : (
+                  '🎉 Create Account'
+                )}
+              </Button>
+            </form>
+          )}
 
           <div className="mt-8 text-center">
             <p className="text-gray-600">

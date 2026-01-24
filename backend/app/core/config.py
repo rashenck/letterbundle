@@ -38,6 +38,15 @@ class Settings(BaseSettings):
     # Mistral AI
     mistral_api_key: str = ""
 
+    # Email Configuration
+    smtp_server: str | None = None
+    smtp_port: int | None = None
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_use_tls: bool = True
+    from_email: str | None = None
+    frontend_url: str = "http://localhost:3000"
+
     # Validation
     min_slug_length: int = 4
     max_slug_length: int = 30

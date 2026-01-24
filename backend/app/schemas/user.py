@@ -5,14 +5,14 @@ from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field
 
+from app.core.constants import USERNAME_PATTERN
+
 
 class UserBase(BaseModel):
     """Base user schema."""
 
     email: EmailStr
-    username: str = Field(
-        min_length=4, max_length=30, pattern=r"^[a-z][a-z\-]*[a-z]$|^[a-z]{1,4}$"
-    )
+    username: str = Field(min_length=4, max_length=30, pattern=USERNAME_PATTERN.pattern)
     first_name: str = Field(min_length=1, max_length=100)
     last_name: str = Field(min_length=1, max_length=100)
 

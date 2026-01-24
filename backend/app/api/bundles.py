@@ -55,11 +55,10 @@ async def create_bundle(
 ) -> Bundle:
     """Create a new bundle."""
     # Validate slug
-    is_valid, error = validate_slug(bundle_data.slug)
-    if not is_valid:
+    if not USERNAME_PATTERN.match(bundle_data.slug):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid slug: {error}",
+            detail="Invalid slug: must contain only lowercase letters, numbers, and hyphens, and start/end with a letter or number",
         )
 
     # Check if slug already exists

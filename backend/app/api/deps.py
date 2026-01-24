@@ -47,6 +47,12 @@ async def get_current_user(
     if user is None:
         raise credentials_exception
 
+    if not user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email not verified. Please check your email for verification link.",
+        )
+
     return user
 
 
