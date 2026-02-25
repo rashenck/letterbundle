@@ -1,0 +1,120 @@
+# Dependabot Configuration
+
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "dependabot[bot]"
+    assignees:
+      - "dependabot[bot]"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+
+  # Enable version updates for uv
+  - package-ecosystem: "uv"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "dependabot[bot]"
+    assignees:
+      - "dependabot[bot]"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "uv"
+
+  # Enable version updates for Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "dependabot[bot]"
+    assignees:
+      - "dependabot[bot]"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "docker"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "dependabot[bot]"
+    assignees:
+      - "dependabot[bot]"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "actions"
+
+# Configuration options
+# For more information, see: https://docs.github.com/dependabot
+
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+#
+# Please see the documentation for all configuration options:
+# https://docs.github.com/dependabot/configuration-options-for-the-dependabot.yml-file
+
+# Key settings:
+# - weekly updates on Monday at 9 AM
+# - limit to 10 PRs per ecosystem to avoid overwhelming
+# - use consistent commit message prefix "deps"
+# - add appropriate labels for easy filtering
+# - assign to dependabot bot for automatic management
+
+# Supported ecosystems:
+# - npm (Node.js packages)
+# - pip (Python packages)
+# - docker (Docker base images)
+# - github-actions (GitHub Actions)
+# - cargo (Rust crates)
+# - bundler (Ruby gems)
+# - composer (PHP packages)
+# - maven (Java packages)
+# - nuget (C# packages)
+# - terraform (Terraform providers)
+# - pip-tools (Python requirements)
+# - dockerfile (Dockerfile base images)
+# - docker-compose (Docker Compose services)
+# - gradle (Java/Groovy projects)
+# - elm (Elm packages)
+# - go-modules (Go modules)
+# - hex (Elixir/Erlang packages)
+# - maven (Java projects)
+# - npm-and-yarn (both npm and yarn)
+# - pipfile (Python Pipfile)
+# - sbt (Scala projects)
+# - terraform (Terraform configurations)
+# - yarn (Yarn package manager)
