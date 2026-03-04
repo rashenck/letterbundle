@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_current_user, get_current_user_optional
+from app.core.constants import USERNAME_PATTERN
 from app.core.database import get_db
 from app.core.security import validate_slug
 from app.models import Bundle, Letter, User
