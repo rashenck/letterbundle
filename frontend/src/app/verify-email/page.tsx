@@ -21,7 +21,7 @@ export default function VerifyEmailPage() {
       }
 
       try {
-        const response = await fetch('/api/auth/verify-email?token=' + encodeURIComponent(token))
+        const response = await fetch('http://localhost:8000/api/auth/verify-email?token=' + encodeURIComponent(token))
         const data = await response.json()
 
         if (response.ok) {
