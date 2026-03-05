@@ -44,7 +44,6 @@ test:
 	cd frontend && npm test
 
 backend-test:
-    docker-compose build backend-tests
 	docker compose run --rm backend-tests
 
 lint:
