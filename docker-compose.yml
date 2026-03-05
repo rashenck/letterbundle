@@ -59,6 +59,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      target: base
     container_name: letterbundle-backend
     ports:
       - "8000:8000"
@@ -80,6 +81,27 @@ services:
       start_period: 10s
       retries: 3
 
+  backend-tests:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: dev
+    container_name: letterbundle-backend-tests
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/letterbundle
+      - SECRET_KEY=change-me-in-production-use-a-long-random-string
+      - S3_ENDPOINT_URL=http://localstack:4566
+      - S3_BUCKET=letterbundle-images
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+    #command: [] # Should run all tests by default
+    entrypoint: ["sh", "-c", "pytest \"$@\"", "--"]
+  
 volumes:
   postgres_data:
   localstack_data:
