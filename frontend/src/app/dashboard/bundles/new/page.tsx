@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
+import { apiClient } from '@/lib/api'
 
 export default function CreateBundlePage() {
   const router = useRouter()
@@ -52,21 +53,7 @@ export default function CreateBundlePage() {
 
     try {
       setIsLoading(true)
-      const response = await fetch('http://localhost:8000/api/bundles', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.detail || 'Failed to create bundle')
-      }
-
-      const bundle = await response.json()
+      const bundle = await apiClient.createBundle(token, formData)
       router.push(`/dashboard/bundles/${bundle.id}`)
     } catch (err: any) {
       setError(err.message || 'Failed to create bundle')

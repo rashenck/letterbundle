@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth'
+import { apiClient } from '@/lib/api'
 
 export default function SettingsPage() {
   const { user, token, refreshUser } = useAuth()
@@ -39,19 +40,7 @@ export default function SettingsPage() {
 
     try {
       setIsLoading(true)
-      const response = await fetch('http://localhost:8000/api/users/me', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to update profile')
-      }
-
+      await apiClient.updateProfile(token, formData)
       await refreshUser()
       setSuccess('Profile updated successfully!')
     } catch (err: any) {

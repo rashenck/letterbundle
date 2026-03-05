@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
+import { apiClient } from '@/lib/api'
 
 interface Bundle {
   id: string
@@ -47,17 +48,7 @@ export default function EditBundlePage() {
 
   const loadBundle = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/bundles/${bundleId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to load bundle')
-      }
-
-      const data = await response.json()
+      const data = await apiClient.getBundle(bundleId)
       setBundle(data)
       setFormData({
         title: data.title,
@@ -73,16 +64,8 @@ export default function EditBundlePage() {
 
   const loadLetters = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/bundles/${bundleId}/letters`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setLetters(Array.isArray(data) ? data : [])
-      }
+      const data = await apiClient.request(`/bundles/${bundleId}/letters`)
+      setLetters(Array.isArray(data) ? data : [])
     } catch (err) {
       // Silently fail for letters
     }
@@ -101,20 +84,7 @@ export default function EditBundlePage() {
     if (!token || !bundle) return
 
     try {
-      const response = await fetch(`http://localhost:8000/api/bundles/${bundleId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to update bundle')
-      }
-
-      const updated = await response.json()
+      const updated = await apiClient.updateBundle(token, bundleId, formData)
       setBundle(updated)
       alert('Collection updated successfully!')
     } catch (err: any) {
@@ -126,16 +96,8 @@ export default function EditBundlePage() {
     if (!token || !window.confirm('Delete this letter?')) return
 
     try {
-      const response = await fetch(`http://localhost:8000/api/letters/${letterId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (response.ok) {
-        setLetters(letters.filter((l) => l.id !== letterId))
-      }
+      await apiClient.deleteLetter(token, letterId)
+      setLetters(letters.filter((l) => l.id !== letterId))
     } catch (err) {
       setError('Failed to delete letter')
     }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { API_BASE_URL } from '@/lib/api'
 
 export default function VerifyEmailPage() {
   const [isVerifying, setIsVerifying] = useState(true)
@@ -21,7 +22,7 @@ export default function VerifyEmailPage() {
       }
 
       try {
-        const response = await fetch('http://localhost:8000/api/auth/verify-email?token=' + encodeURIComponent(token))
+        const response = await fetch(`${API_BASE_URL}/auth/verify-email?token=` + encodeURIComponent(token))
         const data = await response.json()
 
         if (response.ok) {

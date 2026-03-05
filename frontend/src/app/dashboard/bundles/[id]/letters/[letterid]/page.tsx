@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
+import { apiClient, API_BASE_URL } from '@/lib/api'
 
 interface Letter {
   id: string
@@ -70,17 +71,7 @@ export default function EditLetterPage() {
 
   const loadLetter = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/letters/${letterId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to load letter')
-      }
-
-      const data = await response.json()
+      const data = await apiClient.getLetter(letterId)
       setLetter(data)
       setPages(data.pages || [])
       setFormData({
@@ -113,7 +104,7 @@ export default function EditLetterPage() {
     // Poll every 2 seconds to check if transcription is available
     pollIntervalRef.current = setInterval(async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/letters/${letter?.id}`, {
+        const response = await fetch(`${API_BASE_URL}/letters/${letter?.id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -142,7 +133,7 @@ export default function EditLetterPage() {
 
     try {
       setIsOCRProcessing(true)
-      const response = await fetch(`http://localhost:8000/api/letters/${letter.id}/process`, {
+      const response = await fetch(`${API_BASE_URL}/letters/${letter.id}/process`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -168,7 +159,7 @@ export default function EditLetterPage() {
       const urls: Record<string, string> = {}
       for (const page of pages) {
         try {
-          const response = await fetch(`http://localhost:8000/api/pages/${page.id}/image/thumbnail`, {
+          const response = await fetch(`${API_BASE_URL}/pages/${page.id}/image/thumbnail`, {
             headers: {
               'Authorization': `Bearer ${token}`,
             },
@@ -199,7 +190,7 @@ export default function EditLetterPage() {
     if (!token || !letter) return
 
     try {
-      const response = await fetch(`http://localhost:8000/api/letters/${letter.id}`, {
+      const response = await fetch(`${API_BASE_URL}/letters/${letter.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -245,7 +236,7 @@ export default function EditLetterPage() {
         formDataToSend.append('files', files[i])
       }
 
-      const response = await fetch(`http://localhost:8000/api/letters/${letterId}/pages`, {
+      const response = await fetch(`${API_BASE_URL}/letters/${letterId}/pages`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -275,7 +266,7 @@ export default function EditLetterPage() {
     if (!token || !letter) return
 
     try {
-      const response = await fetch(`http://localhost:8000/api/letters/${letter.id}`, {
+      const response = await fetch(`${API_BASE_URL}/letters/${letter.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
