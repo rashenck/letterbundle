@@ -1,4 +1,4 @@
-.PHONY: help install dev up down migrate backend frontend test lint format
+.PHONY: help install dev up down migrate backend frontend test backend-test lint format
 
 help:
 	@echo "Letterbundle Development Commands"
@@ -16,6 +16,7 @@ help:
 	@echo ""
 	@echo "Quality:"
 	@echo "  make test       - Run all tests"
+	@echo "  make backend-test - Run backend tests inside Docker"
 	@echo "  make lint       - Run linters"
 	@echo "  make format     - Format code"
 
@@ -41,6 +42,9 @@ frontend:
 test:
 	cd backend && uv run pytest
 	cd frontend && npm test
+
+backend-test:
+	docker compose run --rm backend-tests
 
 lint:
 	cd backend && uv run ruff check .
