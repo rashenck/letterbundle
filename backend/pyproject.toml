@@ -94,42 +94,6 @@ module = "app.core.security"
 ignore_errors = true
 
 [[tool.mypy.overrides]]
-module = "app.models.user"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "app.models.page"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "app.models.letter"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "app.models.bundle"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "app.api.pages"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "app.api.bundles"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "app.api.auth"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "app.api.letters"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "app.services.ocr"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
 module = "app.main"
 ignore_errors = true
 

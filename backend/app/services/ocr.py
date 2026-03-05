@@ -6,6 +6,7 @@ import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from mistralai import Mistral
 from PIL import Image
@@ -22,9 +23,9 @@ class OCRResult:
     """Result from OCR processing."""
 
     text: str
-    pages: list[dict]
+    pages: list[dict[str, Any]]
     model: str
-    usage: dict | None = None
+    usage: dict[str, Any] | None = None
 
 
 class OCRClient:
@@ -119,11 +120,11 @@ class OCRClient:
                 # Create white background for transparent images
                 background = Image.new("RGB", img.size, (255, 255, 255))
                 if img.mode == "P":
-                    img = img.convert("RGBA")
+                    img = img.convert("RGBA")  # type: ignore[assignment]
                 background.paste(img, mask=img.split()[-1] if "A" in img.mode else None)
-                img = background
+                img = background  # type: ignore[assignment]
             elif img.mode != "RGB":
-                img = img.convert("RGB")
+                img = img.convert("RGB")  # type: ignore[assignment]
 
             original_width, original_height = img.size
             quality = 95
@@ -212,12 +213,12 @@ class OCRClient:
     def _parse_response(self, response) -> OCRResult:
         """Parse the OCR API response into an OCRResult."""
         # Extract text from all pages
-        pages = []
-        all_text = []
+        pages: list[dict[str, Any]] = []
+        all_text: list[str] = []
 
         if hasattr(response, "pages") and response.pages:
             for page in response.pages:
-                page_data = {
+                page_data: dict[str, Any] = {
                     "index": getattr(page, "index", 0),
                     "markdown": getattr(page, "markdown", ""),
                 }
@@ -290,7 +291,9 @@ class LetterboxOCRService:
                 raise
         return self.client
 
-    async def process_page(self, image_data: bytes, page_number: int = 1) -> dict:
+    async def process_page(
+        self, image_data: bytes, page_number: int = 1
+    ) -> dict[str, Any]:
         """Process a single page image with OCR.
 
         Args:
@@ -323,7 +326,7 @@ class LetterboxOCRService:
             logger.error(f"Error processing page {page_number}: {e}")
             raise
 
-    async def process_letter(self, page_images: list[bytes]) -> dict:
+    async def process_letter(self, page_images: list[bytes]) -> dict[str, Any]:
         """Process multiple pages (letter) with OCR.
 
         Args:

@@ -43,7 +43,9 @@ async def list_my_bundles(
     )
     bundles = list(result.scalars().all())
 
-    return BundleList(bundles=bundles, total=total)
+    return BundleList(
+        bundles=[BundleResponse.model_validate(b) for b in bundles], total=total
+    )
 
 
 @router.post("", response_model=BundleResponse, status_code=status.HTTP_201_CREATED)
@@ -107,9 +109,11 @@ async def list_public_bundles(
         .offset(skip)
         .limit(limit)
     )
-    bundles = result.scalars().all()
+    bundles = list(result.scalars().all())
 
-    return BundleList(bundles=bundles, total=total)
+    return BundleList(
+        bundles=[BundleResponse.model_validate(b) for b in bundles], total=total
+    )
 
 
 @router.get("/by-slug/{slug}", response_model=BundleResponse)

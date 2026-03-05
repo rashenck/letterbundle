@@ -1,6 +1,6 @@
 """Auth API routes."""
 
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr
@@ -121,7 +121,7 @@ async def login(
 
 
 @router.post("/logout")
-async def logout() -> dict:
+async def logout() -> dict[str, Any]:
     """Logout (client should discard token)."""
     return {"message": "Successfully logged out"}
 
@@ -138,7 +138,7 @@ async def get_me(
 async def resend_verification(
     login_data: LoginRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Resend verification email."""
     result = await db.execute(select(User).where(User.email == login_data.email))
     user = result.scalar_one_or_none()
@@ -166,7 +166,7 @@ async def resend_verification(
 async def verify_email(
     token: str,
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Verify email with token (query parameter for frontend redirect)."""
     print(f"DEBUG: Looking up user with token: {token}")
     result = await db.execute(select(User).where(User.verification_token == token))
@@ -195,7 +195,7 @@ async def verify_email(
 async def debug_token(
     token: str,
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Debug endpoint to check if token exists."""
     result = await db.execute(select(User).where(User.verification_token == token))
     user = result.scalar_one_or_none()

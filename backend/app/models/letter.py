@@ -3,12 +3,17 @@
 import uuid
 from datetime import date, datetime
 from enum import Enum
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Date, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.bundle import Bundle
+    from app.models.page import LetterPage
 
 
 class LetterStatus(str, Enum):
@@ -48,13 +53,11 @@ class Letter(Base):
     )
 
     # Relationships
-    bundle: Mapped["Bundle"] = relationship(  # noqa: F821
-        "Bundle", back_populates="letters"
-    )
-    pages: Mapped[list["LetterPage"]] = relationship(  # noqa: F821
+    bundle: Mapped["Bundle"] = relationship("Bundle", back_populates="letters")
+    pages: Mapped[list["LetterPage"]] = relationship(
         "LetterPage", back_populates="letter", cascade="all, delete-orphan"
     )
-    tags: Mapped[list["LetterTag"]] = relationship(  # noqa: F821
+    tags: Mapped[list["LetterTag"]] = relationship(
         "LetterTag", back_populates="letter", cascade="all, delete-orphan"
     )
 

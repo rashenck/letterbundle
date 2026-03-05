@@ -1,7 +1,7 @@
 """Letter pages API routes."""
 
 import uuid
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import (
     APIRouter,
@@ -183,7 +183,7 @@ async def get_page_image(
     page_id: uuid.UUID,
     version: str,
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Get a presigned URL for a page image.
 
     Version can be: original, processed, thumbnail
