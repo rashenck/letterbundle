@@ -26,7 +26,6 @@ CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "800
 
 FROM base as dev
 
-# Install ALL dependencies including dev extras (pytest etc.)
 RUN uv sync --frozen --extra dev
 
 # Add venv to PATH so pytest is found directly
