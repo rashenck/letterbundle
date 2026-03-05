@@ -2,12 +2,16 @@
 
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.bundle import Bundle
 
 
 class User(Base):
@@ -33,7 +37,7 @@ class User(Base):
     verification_token: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     # Relationships
-    bundles: Mapped[list["Bundle"]] = relationship(  # noqa: F821
+    bundles: Mapped[list["Bundle"]] = relationship(
         "Bundle", back_populates="user", cascade="all, delete-orphan"
     )
 

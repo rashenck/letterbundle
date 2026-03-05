@@ -5,8 +5,8 @@ import logging
 import secrets
 import smtplib
 import urllib.parse
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from pydantic import BaseModel
 
@@ -52,7 +52,6 @@ class EmailService:
 
     def create_verification_url(self, token: str) -> str:
         """Create verification URL."""
-        import urllib.parse
 
         encoded_token = urllib.parse.quote_plus(token)
         return f"{self.config.frontend_url}/verify-email?token={encoded_token}"
@@ -82,7 +81,8 @@ The LetterBundle Team
         if not self._is_configured:
             # Log verification link for local testing
             logger.warning(
-                f"Email not configured. Verification link for {to_email}: {verification_url}"
+                f"Email not configured. Verification link for {to_email}: "
+                f"{verification_url}"
             )
             return True
 

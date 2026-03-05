@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { apiClient } from '@/lib/api'
 
 interface User {
   id: string
@@ -31,18 +32,7 @@ export default function UserProfilePage() {
       setError('')
 
       // Get user profile
-      const userResponse = await fetch(
-        `http://localhost:8000/api/users/${username}`
-      )
-
-      if (!userResponse.ok) {
-        if (userResponse.status === 404) {
-          throw new Error('User not found')
-        }
-        throw new Error('Failed to load user profile')
-      }
-
-      const userData = await userResponse.json()
+      const userData = await apiClient.getProfile(username)
       setUser(userData)
     } catch (err: any) {
       setError(err.message || 'Failed to load user profile')

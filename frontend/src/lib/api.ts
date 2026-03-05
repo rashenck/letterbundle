@@ -2,7 +2,7 @@
  * API client for LetterBundle backend
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
 
 export interface ApiError {
   message: string
@@ -17,7 +17,7 @@ class ApiClient {
     this.baseUrl = baseUrl
   }
 
-  async request<T>(
+  async request<T = any>(
     endpoint: string,
     options?: RequestInit
   ): Promise<T> {
@@ -156,8 +156,74 @@ class ApiClient {
     })
   }
 
-  getBundleBySlug(slug: string) {
+  getBundleBySlug(slug: string): Promise<any> {
     return this.request(`/bundles/by-slug/${slug}`)
+  }
+
+  // Public bundles
+  listPublicBundles(): Promise<any> {
+    return this.request('/bundles/public')
+  }
+
+  // Letter endpoints
+  getLetter(letterId: string): Promise<any> {
+    return this.request(`/letters/${letterId}`)
+  }
+
+  createLetter(token: string, bundleId: string, data: any): Promise<any> {
+    return this.request(`/bundles/${bundleId}/letters`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+  }
+
+  updateLetter(token: string, letterId: string, data: any): Promise<any> {
+    return this.request(`/letters/${letterId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+  }
+
+  deleteLetter(token: string, letterId: string): Promise<any> {
+    return this.request(`/letters/${letterId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+  }
+
+  processLetter(token: string, letterId: string): Promise<any> {
+    return this.request(`/letters/${letterId}/process`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+  }
+
+  getLetterPages(letterId: string): Promise<any> {
+    return this.request(`/letters/${letterId}/pages`)
+  }
+
+  uploadPage(token: string, letterId: string, formData: FormData) {
+    return fetch(`${this.baseUrl}/letters/${letterId}/pages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    })
+  }
+
+  getPageImageUrl(pageId: string, version: string = 'processed') {
+    return `${this.baseUrl}/pages/${pageId}/image/${version}`
   }
 }
 

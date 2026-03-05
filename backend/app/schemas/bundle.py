@@ -17,9 +17,7 @@ class BundleBase(BaseModel):
 class BundleCreate(BundleBase):
     """Schema for creating a bundle."""
 
-    slug: str = Field(
-        min_length=4, max_length=30, pattern=r"^[a-z][a-z\-]*[a-z]$|^[a-z]{1,4}$"
-    )
+    slug: str = Field(min_length=4, max_length=30, pattern=r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
 
 class BundleUpdate(BaseModel):

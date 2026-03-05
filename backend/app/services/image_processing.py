@@ -2,9 +2,8 @@
 
 from dataclasses import dataclass
 from io import BytesIO
-from typing import Optional
 
-from PIL import Image, ImageChops, ImageStat
+from PIL import Image, ImageChops
 
 
 @dataclass
@@ -33,7 +32,7 @@ class ProcessedImage:
     original_bytes: bytes
     processed_bytes: bytes
     thumbnail_bytes: bytes
-    crop_box: Optional[CropBox] = None
+    crop_box: CropBox | None = None
     format: str = "JPEG"
 
 
@@ -83,7 +82,7 @@ class ImageProcessor:
             format=original_img.format if original_img.format else "JPEG",
         )
 
-    def auto_crop(self, image: Image.Image) -> tuple[Image.Image, Optional[CropBox]]:
+    def auto_crop(self, image: Image.Image) -> tuple[Image.Image, CropBox | None]:
         """
         Attempt to detect paper edges and crop.
 
@@ -93,7 +92,8 @@ class ImageProcessor:
         3. Add small padding
 
         Returns:
-            Tuple of (cropped_image, crop_box) or (original_image, None) if detection fails
+            Tuple of (cropped_image, crop_box) or (original_image, None)
+            if detection fails
         """
         try:
             # Convert to grayscale for analysis
@@ -221,7 +221,7 @@ class ImageProcessor:
         )
 
     def _process_and_encode(
-        self, image: Image.Image, quality: Optional[int] = None
+        self, image: Image.Image, quality: int | None = None
     ) -> bytes:
         """Process image and encode to JPEG.
 
@@ -247,7 +247,7 @@ class ImageProcessor:
 
     @staticmethod
     def _image_to_bytes(
-        image: Image.Image, format: Optional[str] = None, quality: Optional[int] = None
+        image: Image.Image, format: str | None = None, quality: int | None = None
     ) -> bytes:
         """Convert PIL Image to bytes.
 

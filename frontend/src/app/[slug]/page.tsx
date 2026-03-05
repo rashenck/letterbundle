@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { apiClient } from '@/lib/api'
 
 interface User {
   id: string
@@ -65,31 +66,14 @@ export default function PublicBundlePage() {
       setError('')
 
       // Get bundle by slug
-      const bundleResponse = await fetch(
-        `http://localhost:8000/api/bundles/by-slug/${slug}`
-      )
-
-      if (!bundleResponse.ok) {
-        if (bundleResponse.status === 404) {
-          throw new Error('Bundle not found')
-        }
-        throw new Error('Failed to load bundle')
-      }
-
-      const bundleData = await bundleResponse.json()
+      const bundleData = await apiClient.getBundleBySlug(slug) as Bundle
       setBundle(bundleData)
 
       // Get letters in bundle
-      const lettersResponse = await fetch(
-        `http://localhost:8000/api/bundles/${bundleData.id}/letters`
-      )
-
-      if (lettersResponse.ok) {
-        const lettersData = await lettersResponse.json()
-        setLetters(lettersData)
-        if (lettersData.length > 0) {
-          setSelectedLetter(lettersData[0])
-        }
+      const lettersData = await apiClient.request(`/bundles/${bundleData.id}/letters`)
+      setLetters(lettersData as Letter[])
+      if (lettersData && (lettersData as Letter[]).length > 0) {
+        setSelectedLetter((lettersData as Letter[])[0])
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load bundle')

@@ -2,13 +2,16 @@
 
 import uuid
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.letter import Letter
 
 
 class LetterPage(Base):
@@ -39,9 +42,7 @@ class LetterPage(Base):
     )
 
     # Relationships
-    letter: Mapped["Letter"] = relationship(  # noqa: F821
-        "Letter", back_populates="pages"
-    )
+    letter: Mapped["Letter"] = relationship("Letter", back_populates="pages")
 
     def __repr__(self) -> str:
         return f"<LetterPage {self.id} page {self.page_number}>"

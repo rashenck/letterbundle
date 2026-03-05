@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { EmptyState, SkeletonLoader } from '@/components/ui'
+import { apiClient } from '@/lib/api'
 
 interface User {
   id: string
@@ -38,13 +39,7 @@ export default function BrowsePage() {
       setIsLoading(true)
       setError('')
       
-      const response = await fetch('http://localhost:8000/api/bundles/public')
-      
-      if (!response.ok) {
-        throw new Error('Failed to load bundles')
-      }
-      
-      const data = await response.json()
+      const data = await apiClient.listPublicBundles()
       setBundles(data.bundles || [])
     } catch (err: any) {
       setError(err.message || 'Failed to load bundles')

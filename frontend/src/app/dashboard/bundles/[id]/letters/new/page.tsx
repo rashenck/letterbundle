@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
+import { API_BASE_URL } from '@/lib/api'
 
 export default function CreateLetterPage() {
   const router = useRouter()
@@ -47,7 +48,7 @@ export default function CreateLetterPage() {
       setIsLoading(true)
 
       // Step 1: Create the letter
-      const createResponse = await fetch(`http://localhost:8000/api/bundles/${bundleId}/letters`, {
+      const createResponse = await fetch(`${API_BASE_URL}/bundles/${bundleId}/letters`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +71,7 @@ export default function CreateLetterPage() {
           formDataToSend.append('files', file)
         })
 
-        const uploadResponse = await fetch(`http://localhost:8000/api/letters/${createdLetter.id}/pages`, {
+        const uploadResponse = await fetch(`${API_BASE_URL}/letters/${createdLetter.id}/pages`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

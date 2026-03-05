@@ -1,7 +1,5 @@
 """S3 storage service for image and file uploads."""
 
-from typing import Optional
-
 import boto3
 from botocore.exceptions import ClientError
 
@@ -45,7 +43,7 @@ class S3Storage:
             print(f"Error uploading to S3: {e}")
             return False
 
-    def download_file(self, s3_key: str) -> Optional[bytes]:
+    def download_file(self, s3_key: str) -> bytes | None:
         """Download file from S3.
 
         Args:
@@ -79,7 +77,7 @@ class S3Storage:
 
     def get_presigned_url(
         self, s3_key: str, expiration_seconds: int = 3600
-    ) -> Optional[str]:
+    ) -> str | None:
         """Get presigned URL for file access.
 
         Args:
@@ -155,7 +153,7 @@ class S3Storage:
 
 
 # Global instance for easy access
-_s3_storage: Optional[S3Storage] = None
+_s3_storage: S3Storage | None = None
 
 
 def get_s3_storage() -> S3Storage:

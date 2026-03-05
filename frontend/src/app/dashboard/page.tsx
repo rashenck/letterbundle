@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
+import { apiClient } from '@/lib/api'
 import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui'
 
 interface Bundle {
@@ -30,17 +31,7 @@ export default function DashboardPage() {
 
     try {
       setIsLoading(true)
-      const response = await fetch('http://localhost:8000/api/bundles', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to load bundles')
-      }
-
-      const data = await response.json()
+      const data = await apiClient.listBundles(token)
       setBundles(data.bundles || [])
     } catch (err: any) {
       setError(err.message || 'Failed to load bundles')
@@ -55,16 +46,8 @@ export default function DashboardPage() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/api/bundles/${bundleId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (response.ok) {
-        setBundles(bundles.filter((b) => b.id !== bundleId))
-      }
+      await apiClient.deleteBundle(token, bundleId)
+      setBundles(bundles.filter((b) => b.id !== bundleId))
     } catch (err) {
       setError('Failed to delete bundle')
     }

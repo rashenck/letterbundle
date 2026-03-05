@@ -28,6 +28,7 @@ class LetterUpdate(LetterBase):
     """Schema for updating a letter."""
 
     transcription: str | None = None
+    tags: list[str] | None = None
 
 
 class LetterReorder(BaseModel):

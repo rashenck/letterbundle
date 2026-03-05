@@ -63,8 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true)
       try {
         await apiClient.register(data)
-        // Auto-login after registration
-        await login(data.email, data.password)
+        // Don't auto-login - user needs to verify email first
       } finally {
         setIsLoading(false)
       }

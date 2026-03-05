@@ -6,11 +6,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_current_user, get_current_user_optional
+from app.core.constants import USERNAME_PATTERN
 from app.core.database import get_db
-from app.core.security import validate_slug
 from app.models import Bundle, Letter, User
 from app.schemas.bundle import BundleCreate, BundleList, BundleResponse, BundleUpdate
 from app.schemas.letter import LetterCreate, LetterReorder, LetterResponse
@@ -44,7 +43,9 @@ async def list_my_bundles(
     )
     bundles = list(result.scalars().all())
 
-    return BundleList(bundles=bundles, total=total)
+    return BundleList(
+        bundles=[BundleResponse.model_validate(b) for b in bundles], total=total
+    )
 
 
 @router.post("", response_model=BundleResponse, status_code=status.HTTP_201_CREATED)
@@ -58,7 +59,10 @@ async def create_bundle(
     if not USERNAME_PATTERN.match(bundle_data.slug):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid slug: must contain only lowercase letters, numbers, and hyphens, and start/end with a letter or number",
+            detail=(
+                "Invalid slug: must contain only lowercase letters, numbers, "
+                "and hyphens, and start/end with a letter or number"
+            ),
         )
 
     # Check if slug already exists
@@ -93,21 +97,23 @@ async def list_public_bundles(
     """List public bundles."""
     # Get total count
     count_result = await db.execute(
-        select(func.count()).select_from(Bundle).where(Bundle.is_public == True)
+        select(func.count()).select_from(Bundle).where(Bundle.is_public)
     )
     total = count_result.scalar() or 0
 
     # Get bundles
     result = await db.execute(
         select(Bundle)
-        .where(Bundle.is_public == True)
+        .where(Bundle.is_public)
         .order_by(Bundle.updated_at.desc())
         .offset(skip)
         .limit(limit)
     )
-    bundles = result.scalars().all()
+    bundles = list(result.scalars().all())
 
-    return BundleList(bundles=bundles, total=total)
+    return BundleList(
+        bundles=[BundleResponse.model_validate(b) for b in bundles], total=total
+    )
 
 
 @router.get("/by-slug/{slug}", response_model=BundleResponse)

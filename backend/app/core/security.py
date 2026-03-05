@@ -1,7 +1,6 @@
 """Security utilities for authentication."""
 
-import re
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -29,9 +28,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     """Create a JWT access token."""
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(
+        expire = datetime.now(UTC) + timedelta(
             minutes=settings.access_token_expire_minutes
         )
     to_encode.update({"exp": expire})
@@ -71,7 +70,10 @@ def validate_slug(slug: str) -> tuple[bool, str | None]:
     if not USERNAME_PATTERN.match(slug):
         return (
             False,
-            "Must contain only lowercase letters, numbers, and hyphens, and start/end with a letter or number",
+            (
+                "Must contain only lowercase letters, numbers, and hyphens, "
+                "and start/end with a letter or number"
+            ),
         )
 
     if slug in settings.reserved_words:

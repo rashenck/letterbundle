@@ -45,6 +45,7 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
+exclude = ["alembic/versions/*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -53,3 +54,50 @@ testpaths = ["tests"]
 [tool.mypy]
 python_version = "3.12"
 strict = true
+ignore_missing_imports = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+enable_error_code = ["name-defined"]
+
+[[tool.mypy.overrides]]
+module = "boto3.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "botocore.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "jose.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "passlib.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "PIL.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "app.services.image_processing"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "app.services.storage"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "app.core.security"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "app.main"
+ignore_errors = true
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+]

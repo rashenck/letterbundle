@@ -1,14 +1,13 @@
 """Letter pages API routes."""
 
 import uuid
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import (
     APIRouter,
     BackgroundTasks,
     Depends,
     HTTPException,
-    UploadFile,
     status,
 )
 from sqlalchemy import select
@@ -17,8 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models import Bundle, Letter, LetterPage, User
-from app.schemas.page import PageCrop, PageReorder, PageResponse, PageUpdate
-from app.services.image_processing import ImageProcessor
+from app.schemas.page import PageCrop, PageResponse, PageUpdate
 from app.services.storage import get_s3_storage
 
 router = APIRouter()
@@ -185,7 +183,7 @@ async def get_page_image(
     page_id: uuid.UUID,
     version: str,
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Get a presigned URL for a page image.
 
     Version can be: original, processed, thumbnail
