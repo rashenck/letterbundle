@@ -170,7 +170,8 @@ class OCRClient:
                 else:
                     # We've hit minimum settings, return what we have
                     logger.warning(
-                        "Could not resize image below %.2f MB (minimum settings reached)",
+                        "Could not resize image below %.2f MB "
+                        "(minimum settings reached)",
                         len(result_data) / (1024 * 1024),
                     )
                     return result_data, "image/jpeg"

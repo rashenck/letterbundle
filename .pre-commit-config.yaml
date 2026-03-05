@@ -1,0 +1,26 @@
+# See https://pre-commit.com for more information
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+
+repos:
+  # Python formatting and linting
+  - repo: git@github.com:astral-sh/ruff-pre-commit.git
+    rev: v0.8.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  # Python type checking (runs on all files)
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: bash -c "cd backend && uv run mypy ."
+        language: system
+        pass_filenames: false
+        always_run: true
+        types: [python]
+        stages: [pre-commit]
+        require_serial: true
+

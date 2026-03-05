@@ -85,9 +85,7 @@ async def register(
     await db.refresh(user)
 
     # Send verification email
-    email_sent = await email_service.send_verification_email(
-        user.email, verification_token
-    )
+    await email_service.send_verification_email(user.email, verification_token)
 
     print(f"DEBUG: Created user with verification_token: {verification_token}")
     print(f"DEBUG: User email_verified: {user.email_verified}")
