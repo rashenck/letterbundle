@@ -99,7 +99,6 @@ services:
         condition: service_healthy
       localstack:
         condition: service_healthy
-    #command: [] # Should run all tests by default
     entrypoint: ["sh", "-c", "pytest \"$@\"", "--"]
   
 volumes:
