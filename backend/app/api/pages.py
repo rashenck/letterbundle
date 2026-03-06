@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models import Bundle, Letter, LetterPage, User
-from app.schemas.page import PageCrop, PageResponse, PageUpdate
+from app.schemas.page import PageCrop, PageReorder, PageResponse, PageUpdate
 from app.services.storage import get_s3_storage
 
 router = APIRouter()
@@ -226,3 +226,53 @@ async def get_page_image(
         "s3_key": s3_key,
         "url": url or f"https://letterbundle.s3.amazonaws.com/{s3_key}",
     }
+
+
+@router.put("/{letter_id}/pages/reorder", response_model=list[PageResponse])
+async def reorder_pages(
+    letter_id: uuid.UUID,
+    reorder_data: PageReorder,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> list[LetterPage]:
+    """Reorder pages within a letter."""
+    # Verify letter exists and user owns it
+    letter_result = await db.execute(select(Letter).where(Letter.id == letter_id))
+    letter = letter_result.scalar_one_or_none()
+
+    if not letter:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Letter not found",
+        )
+
+    bundle_result = await db.execute(
+        select(Bundle).where(Bundle.id == letter.bundle_id)
+    )
+    bundle = bundle_result.scalar_one_or_none()
+
+    if not bundle or bundle.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to reorder pages in this letter",
+        )
+
+    # Update page numbers based on the provided order
+    for index, page_id in enumerate(reorder_data.page_ids):
+        result = await db.execute(select(LetterPage).where(LetterPage.id == page_id))
+        page = result.scalar_one_or_none()
+
+        if page and page.letter_id == letter_id:
+            page.page_number = index + 1
+
+    await db.flush()
+
+    # Return reordered pages
+    pages_result = await db.execute(
+        select(LetterPage)
+        .where(LetterPage.letter_id == letter_id)
+        .order_by(LetterPage.page_number)
+    )
+    pages = pages_result.scalars().all()
+
+    return list(pages)

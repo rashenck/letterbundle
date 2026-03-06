@@ -225,6 +225,26 @@ class ApiClient {
   getPageImageUrl(pageId: string, version: string = 'processed') {
     return `${this.baseUrl}/pages/${pageId}/image/${version}`
   }
+
+  updatePage(token: string, pageId: string, data: { transcription?: string | null; rotation?: number }) {
+    return this.request(`/pages/${pageId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+  }
+
+  reorderPages(token: string, letterId: string, pageIds: string[]) {
+    return this.request(`/letters/${letterId}/pages/reorder`, {
+      method: 'PUT',
+      body: JSON.stringify({ page_ids: pageIds }),
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+  }
 }
 
 export const apiClient = new ApiClient()

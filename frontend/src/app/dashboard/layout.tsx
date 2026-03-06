@@ -71,39 +71,40 @@ export default function DashboardLayout({
        </nav>
 
       {/* Sidebar + Content */}
-      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Sidebar */}
-           <div className="md:col-span-1">
-             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-               <h2 className="text-lg font-semibold text-gray-900 mb-4">Navigation</h2>
-               <nav className="space-y-2">
-                 <Link
-                   href="/dashboard"
-                   className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-700 transition-colors"
-                 >
-                   📚 My Collections
-                 </Link>
-                 <Link
-                   href="/dashboard/bundles/new"
-                   className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-700 transition-colors"
-                 >
-                   ➕ Create Collection
-                 </Link>
-                 <Link
-                   href="/dashboard/settings"
-                   className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-700 transition-colors"
-                 >
-                   ⚙️ Settings
-                 </Link>
-               </nav>
-             </div>
-           </div>
-
-          {/* Main Content */}
-          <div className="md:col-span-3">
-            {children}
+      <div className="max-w-full mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Collapsible Sidebar */}
+        <div className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-16 hover:w-64 transition-all duration-300 z-40">
+          <div className="h-full bg-white shadow-lg border-r border-gray-200 p-4 overflow-hidden">
+            <h2 className="font-semibold text-gray-900 mb-4 whitespace-nowrap">Navigation</h2>
+            <nav className="space-y-2">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-700 transition-colors"
+              >
+                <span className="text-lg">📚</span>
+                <span className="whitespace-nowrap">My Collections</span>
+              </Link>
+              <Link
+                href="/dashboard/bundles/new"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-700 transition-colors"
+              >
+                <span className="text-lg">➕</span>
+                <span className="whitespace-nowrap">Create Collection</span>
+              </Link>
+              <Link
+                href="/dashboard/settings"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-700 transition-colors"
+              >
+                <span className="text-lg">⚙️</span>
+                <span className="whitespace-nowrap">Settings</span>
+              </Link>
+            </nav>
           </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="pl-16">
+          {children}
         </div>
       </div>
     </div>

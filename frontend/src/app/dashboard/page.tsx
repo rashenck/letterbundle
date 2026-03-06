@@ -117,7 +117,7 @@ export default function DashboardPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {bundles.map((bundle) => (
-            <Card key={bundle.id} className="group hover:shadow-lg transition-all duration-200">
+            <Card key={bundle.id}>
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
