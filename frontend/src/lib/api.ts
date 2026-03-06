@@ -133,8 +133,12 @@ class ApiClient {
     })
   }
 
-  getBundle(id: string) {
-    return this.request(`/bundles/${id}`)
+  getBundle(id: string, token?: string) {
+    return this.request(`/bundles/${id}`, token ? {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    } : undefined)
   }
 
   updateBundle(token: string, id: string, data: any) {
@@ -156,8 +160,12 @@ class ApiClient {
     })
   }
 
-  getBundleBySlug(slug: string): Promise<any> {
-    return this.request(`/bundles/by-slug/${slug}`)
+  getBundleBySlug(slug: string, token?: string): Promise<any> {
+    return this.request(`/bundles/by-slug/${slug}`, token ? {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    } : undefined)
   }
 
   // Public bundles

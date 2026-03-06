@@ -48,7 +48,7 @@ export default function EditBundlePage() {
 
   const loadBundle = async () => {
     try {
-      const data = await apiClient.getBundle(bundleId)
+  const data = await apiClient.getBundle(bundleId, token ?? undefined)
       setBundle(data)
       setFormData({
         title: data.title,
@@ -64,7 +64,16 @@ export default function EditBundlePage() {
 
   const loadLetters = async () => {
     try {
-      const data = await apiClient.request(`/bundles/${bundleId}/letters`)
+      const data = await apiClient.request(
+        `/bundles/${bundleId}/letters`,
+        token
+          ? {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            }
+          : undefined
+      )
       setLetters(Array.isArray(data) ? data : [])
     } catch (err) {
       // Silently fail for letters

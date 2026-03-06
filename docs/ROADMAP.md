@@ -53,6 +53,11 @@
 - [ ] Admin moderation dashboard
 - [ ] IP address capture and logging for users
 - [ ] Rate limiting (API and uploads)
+ - [ ] Audit frontend auth token usage and backend enforcement
+   - [ ] Review all frontend API calls to ensure Authorization header is sent where required (e.g. bundle/letter endpoints)
+   - [ ] Verify backend enforces authentication and ownership checks for private resources (returns 401/403 appropriately)
+   - [ ] Add integration tests that exercise private vs public access paths for bundles and letters
+   - [ ] Add logging or metrics for auth failures to detect broken calls in production
 
 ### Operational Controls
 
