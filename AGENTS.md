@@ -68,6 +68,7 @@ uv run mypy .
 
 ### Imports
 
+Imports should be at the top of the file unless avoiding a circular dependency.
 Order imports in three groups, separated by blank lines:
 
 ```python
