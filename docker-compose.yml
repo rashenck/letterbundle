@@ -82,6 +82,7 @@ services:
       timeout: 3s
       start_period: 10s
       retries: 3
+    command: ["uv", "run", "fastapi", "dev", "/app/main.py", "--host", "0.0.0.0"]    
 
   backend-migration:
     build:
@@ -98,12 +99,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
-      interval: 30s
-      timeout: 3s
-      start_period: 10s
-      retries: 3
     entrypoint: ["uv", "run", "alembic", "upgrade", "head"]
     volumes:
       - ./backend:/app

@@ -87,6 +87,11 @@ async def run_ocr_for_letter(letter_id: uuid.UUID) -> None:
             # Process each page
             page_transcriptions = []
             for page in pages:
+                # Do not overwrite existing transcriptions but keep in total letter transcription
+                if page.transcription:
+                    page_transcriptions.append(page.transcription)
+                    continue
+
                 try:
                     print(f"Processing page {page.page_number}...")
 
