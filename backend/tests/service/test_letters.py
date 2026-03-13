@@ -4,10 +4,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.models import Bundle, Letter, LetterPage, User
 from app.api.letters import run_ocr_for_letter
+from app.models import Bundle, Letter, LetterPage, User
 
 
 @pytest.mark.asyncio
@@ -52,7 +51,9 @@ async def test_run_ocr_for_letter(db_session, db_engine):
     letter_id = letter.id
 
     with (
-        patch("app.api.letters.get_db_session", return_value=AsyncMock()) as mock_get_db_session,
+        patch(
+            "app.api.letters.get_db_session", return_value=AsyncMock()
+        ) as mock_get_db_session,
         patch("app.api.letters.get_ocr_service") as mock_ocr_service,
         patch("app.api.letters.get_s3_storage") as mock_storage_service,
     ):
@@ -69,9 +70,7 @@ async def test_run_ocr_for_letter(db_session, db_engine):
 
         await run_ocr_for_letter(letter_id)
 
-    result = await db_session.execute(
-        select(Letter).where(Letter.id == letter_id)
-    )
+    result = await db_session.execute(select(Letter).where(Letter.id == letter_id))
     updated_letter = result.scalar_one()
 
     assert updated_letter.status == "ready"

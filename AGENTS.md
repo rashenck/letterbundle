@@ -141,6 +141,7 @@ except ConnectionError as e:
 - Name test files and functions with `test_` prefix
 - Use pytest fixtures for shared setup
 - Use `pytest.raises` for exception testing
+- Run tests using "docker-compose run --rm backend-tests"
 
 ```python
 def test_calculate_total_with_default_tax():
