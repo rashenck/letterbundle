@@ -1,5 +1,5 @@
 """Database configuration and session management."""
-
+from contextlib import asynccontextmanager
 from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -14,7 +14,7 @@ engine = create_async_engine(
     echo=settings.debug,
 )
 
-async_session_maker = async_sessionmaker(
+AsyncSessionLocal = async_sessionmaker(
     engine,
     class_=AsyncSession,
     expire_on_commit=False,
@@ -26,13 +26,21 @@ class Base(DeclarativeBase):
 
     pass
 
-
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
+# --- FastAPI dependency (for BackendTasks & used by FastAPI Dependency Injection) ---
+@asynccontextmanager
+async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     """Dependency for getting database sessions."""
-    async with async_session_maker() as session:
+    async with AsyncSessionLocal() as session:
         try:
             yield session
             await session.commit()
+            await session.close()
         except Exception:
             await session.rollback()
             raise
+
+# --- FastAPI dependency (for routes) ---
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """Dependency for getting database sessions."""
+    async with get_db_session() as session:
+        yield session
