@@ -1,8 +1,11 @@
 """Pytest configuration and fixtures for testing."""
 
 import os
+import base64
+import secrets
 from collections.abc import AsyncGenerator
-from typing import Any
+from typing import Any, Callable
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest_asyncio
 from fastapi.testclient import TestClient
@@ -15,7 +18,9 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from app.core.database import Base, get_db
+from app.core.security import create_access_token, get_password_hash
 from app.main import app
+from app.models.user import User
 
 TEST_DB_PATH = "/tmp/letterbundle_test.db"
 
@@ -62,34 +67,6 @@ async def db_session(db_engine: AsyncEngine) -> AsyncGenerator[AsyncSession, Non
                 yield session
                 await transaction.rollback()
 
-
-@pytest_asyncio.fixture  # type: ignore[untyped-decorator]
-async def client(db_session: AsyncSession) -> AsyncGenerator[TestClient, None]:
-    """Create a test client with database dependency override."""
-
-    async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
-        yield db_session
-
-    app.dependency_overrides[get_db] = override_get_db
-
-    with TestClient(app) as test_client:
-        yield test_client
-
-    app.dependency_overrides.clear()
-
-
-
-@pytest_asyncio.fixture
-async def authenticated_client(
-    client: TestClient,
-    test_user: User,
-) -> TestClient:
-    """Create a test client with authentication headers."""
-    access_token = create_access_token(data={"sub": str(test_user.id)})
-    client.headers = {"Authorization": f"Bearer {access_token}"}
-    return client
-
-
 @pytest_asyncio.fixture
 def mock_email_service() -> MagicMock:
     """Create a mock email service."""
@@ -122,3 +99,71 @@ def mock_ocr_service() -> MagicMock:
         }
     )
     return mock
+
+
+@pytest_asyncio.fixture
+async def user_factory() -> Callable[..., User]:
+    """
+    Factory Fixture to build a user in memory based on kwargs passed in or defaults.
+    If passing in a password kwarg make sure it is not hashed already, this factory handles hashing.
+    """
+    def _factory(**kwargs: Any) -> User:
+        return User(
+            email=kwargs.get("email", "testuser@example.com"),
+            username=kwargs.get("username", "testuser"),
+            password_hash=get_password_hash(kwargs.get("password", "password123")),
+            first_name=kwargs.get("first_name", "Test"),
+            last_name=kwargs.get("last_name", "User"),
+            verification_token=kwargs.get("verification_token", base64.urlsafe_b64encode(secrets.token_bytes(32)).decode()),
+            email_verified=kwargs.get("email_verified", True),
+        )
+
+    return _factory
+
+
+@pytest_asyncio.fixture
+async def persisted_user_factory(db_session: AsyncSession, user_factory: Callable[..., User]) -> Callable[..., User]:
+    """
+    Factory Fixture to build and persist a User object to the database.
+    """
+    async def _factory(**kwargs: Any) -> User:
+        user = user_factory(**kwargs)
+        db_session.add(user)
+        await db_session.flush()
+        await db_session.refresh(user)
+        return user
+    return _factory
+
+
+@pytest_asyncio.fixture
+async def test_user(persisted_user_factory: Callable[..., User]) -> User:
+    """Create a verified test user."""
+    return await persisted_user_factory()
+
+
+
+@pytest_asyncio.fixture  # type: ignore[untyped-decorator]
+async def client(db_session: AsyncSession) -> AsyncGenerator[TestClient, None]:
+    """Create a test client with database dependency override."""
+
+    async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
+        yield db_session
+
+    app.dependency_overrides[get_db] = override_get_db
+
+    with TestClient(app) as test_client:
+        yield test_client
+
+    app.dependency_overrides.clear()
+
+
+
+@pytest_asyncio.fixture
+async def authenticated_client(
+    client: TestClient,
+    test_user: User,
+) -> TestClient:
+    """Create a test client with authentication headers."""
+    access_token = create_access_token(data={"sub": str(test_user.id)})
+    client.headers = {"Authorization": f"Bearer {access_token}"}
+    return client

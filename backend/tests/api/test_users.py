@@ -8,9 +8,9 @@ from app.models import User
 
 
 @pytest.mark.asyncio
-async def test_get_user_profile_success(client: TestClient, test_user: User):
+async def test_get_user_profile_success(authenticated_client: TestClient, test_user: User):
     """Test getting a public user profile."""
-    response = client.get(f"/api/users/{test_user.username}")
+    response = authenticated_client.get(f"/api/users/{test_user.username}")
 
     assert response.status_code == 200
     data = response.json()
@@ -18,9 +18,9 @@ async def test_get_user_profile_success(client: TestClient, test_user: User):
 
 
 @pytest.mark.asyncio
-async def test_get_user_profile_not_found(client: TestClient):
+async def test_get_user_profile_not_found(authenticated_client: TestClient):
     """Test getting a non-existent user profile."""
-    response = client.get("/api/users/nonexistent")
+    response = authenticated_client.get("/api/users/nonexistent")
 
     assert response.status_code == 404
     assert "User not found" in response.json()["detail"]
@@ -39,6 +39,8 @@ async def test_update_me_success(authenticated_client: TestClient, test_user: Us
 
     assert response.status_code == 200
     data = response.json()
+    
+    assert data["id"] == str(test_user.id)
     assert data["first_name"] == "Updated"
     assert data["last_name"] == "Name"
 
@@ -46,8 +48,6 @@ async def test_update_me_success(authenticated_client: TestClient, test_user: Us
 @pytest.mark.asyncio
 async def test_update_me_change_email(
     authenticated_client: TestClient,
-    test_user: User,
-    db_session: AsyncSession,
 ):
     """Test updating email to a new email."""
     response = authenticated_client.put(
@@ -65,7 +65,6 @@ async def test_update_me_change_email(
 @pytest.mark.asyncio
 async def test_update_me_duplicate_email(
     authenticated_client: TestClient,
-    test_user: User,
     db_session: AsyncSession,
 ):
     """Test updating email to one that's already taken."""

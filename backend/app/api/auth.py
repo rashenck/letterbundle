@@ -70,7 +70,6 @@ async def register(
 
     # Create user with email verification
     email_service = get_email_service()
-    breakpoint()
     verification_token = email_service.generate_verification_token()
 
     user = User(

@@ -13,7 +13,7 @@ from app.models import User
 @pytest.mark.asyncio
 async def test_register_success(client: TestClient, mock_email_service: AsyncMock):
     """Test successful user registration."""
-    with patch("app.api.auth.get_email_service", return_value=mock_email_service) as mocked_service:
+    with patch("app.api.auth.get_email_service", return_value=mock_email_service):
         response = client.post(
             "/api/auth/register",
             json={
@@ -24,8 +24,7 @@ async def test_register_success(client: TestClient, mock_email_service: AsyncMoc
                 "last_name": "User",
             },
         )
-        breakpoint()
-        mocked_service.generate_verification_token.assert_called_once()
+        mock_email_service.generate_verification_token.assert_called_once()
 
     assert response.status_code == 201
     data = response.json()
