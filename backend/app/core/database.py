@@ -34,10 +34,11 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
         try:
             yield session
             await session.commit()
-            await session.close()
         except Exception:
             await session.rollback()
             raise
+        finally:
+            await session.close()
 
 # --- FastAPI dependency (for routes) ---
 async def get_db() -> AsyncGenerator[AsyncSession, None]:

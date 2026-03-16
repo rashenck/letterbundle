@@ -3,7 +3,6 @@
 import os
 from collections.abc import AsyncGenerator
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock
 
 import pytest_asyncio
 from fastapi.testclient import TestClient
@@ -16,14 +15,12 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from app.core.database import Base, get_db
-from app.core.security import create_access_token, get_password_hash
 from app.main import app
-from app.models import User
 
 TEST_DB_PATH = "/tmp/letterbundle_test.db"
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(scope="session")  # type: ignore[untyped-decorator]
 async def db_engine() -> AsyncGenerator[AsyncEngine, None]:
     """Create a test database engine with SQLite."""
     if os.path.exists(TEST_DB_PATH):
@@ -51,7 +48,7 @@ async def db_engine() -> AsyncGenerator[AsyncEngine, None]:
         os.remove(TEST_DB_PATH)
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture  # type: ignore[untyped-decorator]
 async def db_session(db_engine: AsyncEngine) -> AsyncGenerator[AsyncSession, None]:
     """Create a test database session with transaction rollback."""
     async with db_engine.connect() as conn:
@@ -66,7 +63,7 @@ async def db_session(db_engine: AsyncEngine) -> AsyncGenerator[AsyncSession, Non
                 await transaction.rollback()
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture  # type: ignore[untyped-decorator]
 async def client(db_session: AsyncSession) -> AsyncGenerator[TestClient, None]:
     """Create a test client with database dependency override."""
 
@@ -80,22 +77,6 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[TestClient, None]:
 
     app.dependency_overrides.clear()
 
-
-@pytest_asyncio.fixture
-async def test_user(db_session: AsyncSession) -> User:
-    """Create a verified test user."""
-    user = User(
-        email="testuser@example.com",
-        username="testuser",
-        password_hash=get_password_hash("password123"),
-        first_name="Test",
-        last_name="User",
-        email_verified=True,
-    )
-    db_session.add(user)
-    await db_session.flush()
-    await db_session.refresh(user)
-    return user
 
 
 @pytest_asyncio.fixture

@@ -59,7 +59,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      target: base
+      target: dev
     container_name: letterbundle-backend
     ports:
       - "8000:8000"
@@ -82,7 +82,7 @@ services:
       timeout: 3s
       start_period: 10s
       retries: 3
-    command: ["uv", "run", "fastapi", "dev", "/app/main.py", "--host", "0.0.0.0"]    
+    command: ["uv", "run", "fastapi", "dev", "app/main.py", "--host", "0.0.0.0"]    
 
   backend-migration:
     build:
