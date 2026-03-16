@@ -167,3 +167,4 @@ async def authenticated_client(
     access_token = create_access_token(data={"sub": str(test_user.id)})
     client.headers = {"Authorization": f"Bearer {access_token}"}
     return client
+    
