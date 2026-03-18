@@ -55,9 +55,10 @@ async def run_ocr_for_letter(letter_id: uuid.UUID) -> None:
         print("✓ OCR service is available")
 
         async with get_db_session() as db_session:
-
             # Fetch letter with pages
-            result = await db_session.execute(select(Letter).where(Letter.id == letter_id))
+            result = await db_session.execute(
+                select(Letter).where(Letter.id == letter_id)
+            )
             letter = result.scalar_one_or_none()
 
             if not letter:
@@ -99,7 +100,9 @@ async def run_ocr_for_letter(letter_id: uuid.UUID) -> None:
                     print(f"Downloading image from S3: {page.s3_key_original}")
                     image_data = storage.download_file(page.s3_key_original)
                     if not image_data:
-                        print(f"⚠️  Failed to download image for page {page.page_number}")
+                        print(
+                            f"⚠️  Failed to download image for page {page.page_number}"
+                        )
                         continue
                     print(f"✓ Downloaded image ({len(image_data)} bytes)")
 
@@ -113,7 +116,9 @@ async def run_ocr_for_letter(letter_id: uuid.UUID) -> None:
                     # Store page-level transcription
                     page.transcription = ocr_result["text"]
                     text_length = len(ocr_result["text"])
-                    print(f"✓ Page {page.page_number} transcribed ({text_length} chars)")
+                    print(
+                        f"✓ Page {page.page_number} transcribed ({text_length} chars)"
+                    )
                     page_transcriptions.append(ocr_result["text"])
 
                 except Exception as e:

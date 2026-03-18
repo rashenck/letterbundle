@@ -1,6 +1,7 @@
 """Database configuration and session management."""
-from contextlib import asynccontextmanager
+
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
@@ -26,6 +27,7 @@ class Base(DeclarativeBase):
 
     pass
 
+
 # --- FastAPI dependency (for BackendTasks & used by FastAPI Dependency Injection) ---
 @asynccontextmanager
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
@@ -39,6 +41,7 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
             raise
         finally:
             await session.close()
+
 
 # --- FastAPI dependency (for routes) ---
 async def get_db() -> AsyncGenerator[AsyncSession, None]:

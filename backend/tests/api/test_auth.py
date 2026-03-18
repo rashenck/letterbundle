@@ -54,7 +54,6 @@ async def test_register_duplicate_email(
     assert "Email already registered" in response.json()["detail"]
 
 
-
 @pytest.mark.asyncio
 async def test_register_duplicate_username(
     client: TestClient, test_user: User, mock_email_service: AsyncMock
