@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: CI-CHECKS
+    name: Test - Ruff(check/format) - mypy
     runs-on: ubuntu-latest
     env:
       UV_VENV: backend/.venv
