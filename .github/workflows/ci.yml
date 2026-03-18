@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: Test
+    name: CI-CHECKS
     runs-on: ubuntu-latest
     env:
       UV_VENV: backend/.venv
@@ -29,7 +29,7 @@ jobs:
         run: uv sync --frozen --extra dev --no-install-project
 
       - name: Run tests
-        run: uv run pytest -x -v
+        run: uv run pytest -v
 
       - name: Run ruff
         run: uv run ruff check .

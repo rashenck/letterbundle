@@ -3,7 +3,7 @@
 import base64
 import os
 import secrets
-from collections.abc import AsyncGenerator, Callable
+from collections.abc import AsyncGenerator, Awaitable, Callable
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
@@ -25,7 +25,7 @@ from app.models.user import User
 TEST_DB_PATH = "/tmp/letterbundle_test.db"
 
 
-@pytest_asyncio.fixture(scope="session")  # type: ignore[untyped-decorator]
+@pytest_asyncio.fixture(scope="session")
 async def db_engine() -> AsyncGenerator[AsyncEngine, None]:
     """Create a test database engine with SQLite."""
     if os.path.exists(TEST_DB_PATH):
@@ -53,7 +53,7 @@ async def db_engine() -> AsyncGenerator[AsyncEngine, None]:
         os.remove(TEST_DB_PATH)
 
 
-@pytest_asyncio.fixture  # type: ignore[untyped-decorator]
+@pytest_asyncio.fixture
 async def db_session(db_engine: AsyncEngine) -> AsyncGenerator[AsyncSession, None]:
     """Create a test database session with transaction rollback."""
     async with db_engine.connect() as conn:
@@ -102,8 +102,7 @@ def mock_ocr_service() -> MagicMock:
     return mock
 
 
-@pytest_asyncio.fixture
-async def user_factory() -> Callable[..., User]:
+def user_factory() -> Callable[..., User]:
     """
     Factory Fixture to build a user in memory based on kwargs passed in or defaults.
     If passing in a password kwarg make sure it is not hashed already,
@@ -130,7 +129,7 @@ async def user_factory() -> Callable[..., User]:
 @pytest_asyncio.fixture
 async def persisted_user_factory(
     db_session: AsyncSession, user_factory: Callable[..., User]
-) -> Callable[..., User]:
+) -> Callable[..., Awaitable[User]]:
     """
     Factory Fixture to build and persist a User object to the database.
     """
@@ -146,12 +145,12 @@ async def persisted_user_factory(
 
 
 @pytest_asyncio.fixture
-async def test_user(persisted_user_factory: Callable[..., User]) -> User:
+async def test_user(persisted_user_factory: Callable[..., Awaitable[User]]) -> User:
     """Create a verified test user."""
     return await persisted_user_factory()
 
 
-@pytest_asyncio.fixture  # type: ignore[untyped-decorator]
+@pytest_asyncio.fixture
 async def client(db_session: AsyncSession) -> AsyncGenerator[TestClient, None]:
     """Create a test client with database dependency override."""
 
