@@ -7,6 +7,7 @@ from collections.abc import AsyncGenerator, Awaitable, Callable
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import event
@@ -102,6 +103,7 @@ def mock_ocr_service() -> MagicMock:
     return mock
 
 
+@pytest.fixture
 def user_factory() -> Callable[..., User]:
     """
     Factory Fixture to build a user in memory based on kwargs passed in or defaults.
