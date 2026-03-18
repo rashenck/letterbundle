@@ -373,6 +373,7 @@ async def upload_letter_pages(
             page.s3_key_thumbnail = thumbnail_key
 
             await db.flush()
+            await db.commit()
             await db.refresh(page)
             created_pages.append(page)
 

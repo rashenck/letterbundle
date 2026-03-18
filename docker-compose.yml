@@ -116,8 +116,6 @@ services:
       - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
       - PYTHONUNBUFFERED=1
     depends_on:
-      postgres:
-        condition: service_healthy
       localstack:
         condition: service_healthy
     entrypoint: ["uv", "run", "pytest"]
