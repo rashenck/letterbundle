@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       UV_VENV: backend/.venv
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
 
@@ -23,23 +26,19 @@ jobs:
         run: uv python install 3.12
 
       - name: Install dependencies
-        working-directory: backend
         run: uv sync --group dev --frozen --project backend
 
       - name: Debug
         run: |
-          uv run --project backend python -m pip list
-          uv run --project backend which pytest
-        working-directory: backend
+          pwd
+          ls -la
+          cat pyproject.toml
 
       - name: Run tests
-        working-directory: backend
-        run: uv run --project backend pytest -x -v
+        run: uv run pytest -x -v
 
       - name: Run ruff
-        working-directory: backend
         run: uv run ruff check .
 
       - name: Run mypy
-        working-directory: backend
         run: uv run mypy .
