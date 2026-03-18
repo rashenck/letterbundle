@@ -9,6 +9,8 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    env:
+      UV_VENV: backend/.venv
     steps:
       - uses: actions/checkout@v4
 
@@ -26,9 +28,7 @@ jobs:
 
       - name: Run tests
         working-directory: backend
-        run: |
-          source .venv/bin/activate
-          uv run pytest -x -v
+        run: uv run pytest -x -v
 
       - name: Run ruff
         working-directory: backend
