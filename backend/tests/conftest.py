@@ -106,7 +106,8 @@ def mock_ocr_service() -> MagicMock:
 async def user_factory() -> Callable[..., User]:
     """
     Factory Fixture to build a user in memory based on kwargs passed in or defaults.
-    If passing in a password kwarg make sure it is not hashed already, this factory handles hashing.
+    If passing in a password kwarg make sure it is not hashed already,
+    this factory handles hashing.
     """
 
     def _factory(**kwargs: Any) -> User:

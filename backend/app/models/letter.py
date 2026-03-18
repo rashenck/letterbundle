@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import date, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Date, DateTime, ForeignKey, Integer, String, Text, func
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from app.models.page import LetterPage
 
 
-class LetterStatus(str, Enum):
+class LetterStatus(StrEnum):
     """Letter processing status."""
 
     DRAFT = "draft"
