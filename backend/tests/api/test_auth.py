@@ -10,7 +10,6 @@ from app.core.security import get_password_hash
 from app.models import User
 
 
-@pytest.mark.asyncio
 async def test_register_success(client: TestClient, mock_email_service: AsyncMock):
     """Test successful user registration."""
     with patch("app.api.auth.get_email_service", return_value=mock_email_service):
