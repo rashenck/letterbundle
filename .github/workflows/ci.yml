@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: backend
-        run: uv sync --dev
+        run: uv sync --group dev
 
       - name: Run tests
         working-directory: backend
@@ -40,7 +40,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: backend
-        run: uv sync --dev
+        run: uv sync --group dev
 
       - name: Run ruff
         working-directory: backend
@@ -60,7 +60,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: backend
-        run: uv sync --dev
+        run: uv sync --group dev
 
       - name: Run mypy
         working-directory: backend
