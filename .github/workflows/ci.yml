@@ -28,17 +28,14 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen --extra dev --no-install-project
 
-      - name: Debug
-        run: |
-          pwd
-          ls -la
-          cat pyproject.toml
-
       - name: Run tests
         run: uv run pytest -x -v
 
       - name: Run ruff
         run: uv run ruff check .
+
+      - name: Run rull(lint)
+        run: uv run ruff format .
 
       - name: Run mypy
         run: uv run mypy .

@@ -4,23 +4,17 @@ default_stages: [pre-commit]
 
 repos:
   # Python formatting and linting
-  - repo: git@github.com:astral-sh/ruff-pre-commit.git
+  - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.0
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
 
-  # Python type checking (runs on all files)
-  - repo: local
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
     hooks:
-      - id: mypy
-        name: mypy
-        entry: bash -c "cd backend && uv run mypy ."
-        language: system
-        pass_filenames: false
-        always_run: true
-        types: [python]
-        stages: [pre-commit]
-        require_serial: true
-
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
