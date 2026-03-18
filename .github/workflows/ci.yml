@@ -28,8 +28,8 @@ jobs:
 
       - name: Debug
         run: |
-          uv run python -m pip list
-          uv run which pytest
+          uv run --project backend python -m pip list
+          uv run --project backend which pytest
         working-directory: backend
 
       - name: Run tests
