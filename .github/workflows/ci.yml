@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test - Ruff(check/format) - mypy
+    runs-on: ubuntu-latest
+    env:
+      UV_VENV: backend/.venv
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.14
+
+      - name: Install dependencies
+        run: uv sync --frozen --extra dev --no-install-project
+
+      - name: Run tests
+        run: uv run pytest -v
+
+      - name: Run ruff
+        run: uv run ruff check .
+
+      - name: Run rull(lint)
+        run: uv run ruff format .
+
+      - name: Run mypy
+        run: uv run mypy .

@@ -1,12 +1,13 @@
 """Pytest configuration and fixtures for testing."""
 
-import os
 import base64
+import os
 import secrets
-from collections.abc import AsyncGenerator
-from typing import Any, Callable
+from collections.abc import AsyncGenerator, Awaitable, Callable
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import event
@@ -25,7 +26,7 @@ from app.models.user import User
 TEST_DB_PATH = "/tmp/letterbundle_test.db"
 
 
-@pytest_asyncio.fixture(scope="session")  # type: ignore[untyped-decorator]
+@pytest_asyncio.fixture(scope="session")
 async def db_engine() -> AsyncGenerator[AsyncEngine, None]:
     """Create a test database engine with SQLite."""
     if os.path.exists(TEST_DB_PATH):
@@ -53,7 +54,7 @@ async def db_engine() -> AsyncGenerator[AsyncEngine, None]:
         os.remove(TEST_DB_PATH)
 
 
-@pytest_asyncio.fixture  # type: ignore[untyped-decorator]
+@pytest_asyncio.fixture
 async def db_session(db_engine: AsyncEngine) -> AsyncGenerator[AsyncSession, None]:
     """Create a test database session with transaction rollback."""
     async with db_engine.connect() as conn:
@@ -66,6 +67,7 @@ async def db_session(db_engine: AsyncEngine) -> AsyncGenerator[AsyncSession, Non
             async with async_session_maker() as session:
                 yield session
                 await transaction.rollback()
+
 
 @pytest_asyncio.fixture
 def mock_email_service() -> MagicMock:
@@ -101,12 +103,14 @@ def mock_ocr_service() -> MagicMock:
     return mock
 
 
-@pytest_asyncio.fixture
-async def user_factory() -> Callable[..., User]:
+@pytest.fixture
+def user_factory() -> Callable[..., User]:
     """
     Factory Fixture to build a user in memory based on kwargs passed in or defaults.
-    If passing in a password kwarg make sure it is not hashed already, this factory handles hashing.
+    If passing in a password kwarg make sure it is not hashed already,
+    this factory handles hashing.
     """
+
     def _factory(**kwargs: Any) -> User:
         return User(
             email=kwargs.get("email", "testuser@example.com"),
@@ -114,7 +118,10 @@ async def user_factory() -> Callable[..., User]:
             password_hash=get_password_hash(kwargs.get("password", "password123")),
             first_name=kwargs.get("first_name", "Test"),
             last_name=kwargs.get("last_name", "User"),
-            verification_token=kwargs.get("verification_token", base64.urlsafe_b64encode(secrets.token_bytes(32)).decode()),
+            verification_token=kwargs.get(
+                "verification_token",
+                base64.urlsafe_b64encode(secrets.token_bytes(32)).decode(),
+            ),
             email_verified=kwargs.get("email_verified", True),
         )
 
@@ -122,27 +129,30 @@ async def user_factory() -> Callable[..., User]:
 
 
 @pytest_asyncio.fixture
-async def persisted_user_factory(db_session: AsyncSession, user_factory: Callable[..., User]) -> Callable[..., User]:
+async def persisted_user_factory(
+    db_session: AsyncSession, user_factory: Callable[..., User]
+) -> Callable[..., Awaitable[User]]:
     """
     Factory Fixture to build and persist a User object to the database.
     """
+
     async def _factory(**kwargs: Any) -> User:
         user = user_factory(**kwargs)
         db_session.add(user)
         await db_session.flush()
         await db_session.refresh(user)
         return user
+
     return _factory
 
 
 @pytest_asyncio.fixture
-async def test_user(persisted_user_factory: Callable[..., User]) -> User:
+async def test_user(persisted_user_factory: Callable[..., Awaitable[User]]) -> User:
     """Create a verified test user."""
     return await persisted_user_factory()
 
 
-
-@pytest_asyncio.fixture  # type: ignore[untyped-decorator]
+@pytest_asyncio.fixture
 async def client(db_session: AsyncSession) -> AsyncGenerator[TestClient, None]:
     """Create a test client with database dependency override."""
 
@@ -157,7 +167,6 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[TestClient, None]:
     app.dependency_overrides.clear()
 
 
-
 @pytest_asyncio.fixture
 async def authenticated_client(
     client: TestClient,
@@ -167,4 +176,3 @@ async def authenticated_client(
     access_token = create_access_token(data={"sub": str(test_user.id)})
     client.headers = {"Authorization": f"Bearer {access_token}"}
     return client
-    

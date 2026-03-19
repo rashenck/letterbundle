@@ -8,7 +8,10 @@ from app.models import User
 
 
 @pytest.mark.asyncio
-async def test_get_user_profile_success(authenticated_client: TestClient, test_user: User):
+async def test_get_user_profile_success(
+    authenticated_client: TestClient,
+    test_user: User,
+):
     """Test getting a public user profile."""
     response = authenticated_client.get(f"/api/users/{test_user.username}")
 
@@ -39,7 +42,7 @@ async def test_update_me_success(authenticated_client: TestClient, test_user: Us
 
     assert response.status_code == 200
     data = response.json()
-    
+
     assert data["id"] == str(test_user.id)
     assert data["first_name"] == "Updated"
     assert data["last_name"] == "Name"
